@@ -10,6 +10,7 @@ import (
 	"github.com/cgentry/gus/record/tenant"
 	"github.com/cgentry/gus/storage"
 	"os"
+	"io/ioutil"
 )
 
 const (
@@ -194,6 +195,7 @@ func runUserShow(cmd *cli.Command, args []string) {
 	cli.RenderTemplate(os.Stdout, template_cmd_usershow, userRecord)
 }
 
+// runUserLoad will load up the current store from a JSON list
 func runUserLoad( cmd *cli.Command, args []string ){
 
 
@@ -206,17 +208,18 @@ func runUserLoad( cmd *cli.Command, args []string ){
 		runtimeFail("No load file passed" , nil )
 	}
 	loadFile := args[0]
-	err = LoadUsersFromJson( c , loadFile )
+	err = LoadUsersFromJson( cmd , loadFile )
 	if err != nil {
 		runtimeFail( "Loading user data from " + loadFile , err )
 	}
 }
 
+// LoadUsersFromJson will load up the store, either clients or users, from
+// the JSON file.
 func LoadUsersFromJson( c *configure.Configure, loadFile string ) ( err error ){
 	var fdata string
 	var users *[]tenant.UserCli
 	var oneUser tenant.User
-	var configStore configure.Store
 
 	_, err = os.Stat(loadFile)
 	if err!= nil {
@@ -225,22 +228,25 @@ func LoadUsersFromJson( c *configure.Configure, loadFile string ) ( err error ){
 	fdata, err = ioutil.ReadFile(loadFile)
 	if err == nil {
 		err = json.Unmarshal(fdata, users)
-		if err == nil {
-			if c.Service.ClientStore && urec.IsSystem {
-				configStore = c.Client
-			} else {
-				configStore = c.User
-			}
-			store, err := storage.Open(configStore.Name, configStore.Dsn, configStore.Options)
-			if err != nil {
-				runtimeFail("Opening database", err)
-			}
+		if err != nil { runtimeFail( "Reading JSON file " , err )
+			clientStore, err := storage.Open( c.Client.Name, c.Client.Dsn, c.Client.Options)
+			if err != nil { return err }
+			defer clientStore.Close()
+
+			userStore, err := storage.Open( c.User.Name , c.User.Dsn, c.User.Options )
+			if err != nil { return err }
+			defer userStore.Close()
+
 			for oneUserCli := range users {
 				err = mappers.UserFromCli( oneUser , oneUserCli)
 				if err != nil {
 					return
 				}
-				err = store.Insert( oneUser )
+				if oneUser.IsSystem {
+					err = clientStore.Insert(oneUser )
+				}else {
+					err = userStore.Insert(oneUser)
+				}
 				if err != nil {
 					return
 				}
