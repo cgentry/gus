@@ -13,36 +13,28 @@ package bcrypt
 
 import (
 	"code.google.com/p/go.crypto/bcrypt"
-	"github.com/cgentry/gus/encryption"
+	"github.com/cgentry/gdriver"
+	"github.com/cgentry/gus/drivers/encryption"
 	"log"
 )
 
 type PwdBcrypt struct {
-	Name  string
 	Salt  string
 	Cost  int
-	Short string
-	Long  string
 }
 
-const ENCRYPTION_DRIVER_ID = "bcrypt"
+const DRIVER_NAME = "bcrypt"
 
-// init will register this driver for use.
-func init() {
-	encryption.Register(New())
-}
-func (t *PwdBcrypt) Id() string        { return t.Name }
-func (t *PwdBcrypt) ShortHelp() string { return t.Short }
-func (t *PwdBcrypt) LongHelp() string  { return t.Long }
+
+func (t *PwdBcrypt) Id() string        { return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_NAME) }
+func (t *PwdBcrypt) ShortHelp() string { return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_SHORT) }
+func (t *PwdBcrypt) LongHelp() string  { return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_LONG) }
 
 // New will create a BCRYPT strucutre. The salt is given a static string but
 // can be set up on selection from the driver. This must be the same with every
 // load or you won't be able to login anymore.
 func New() *PwdBcrypt {
 	c := &PwdBcrypt{
-		Name:  ENCRYPTION_DRIVER_ID,
-		Short: "Standard high-quality encryption using BCRYPT methods",
-		Long:  const_bcrypt_help_template,
 		Cost:  7,
 		Salt:  "vniiO5UD0w5GpJkPijwQCT63MuMjyWnyi5TtUWBGInCq84zaFFsSwGm9DK8UyUeQp{2h&gV,KoQi9ysC",
 	}
