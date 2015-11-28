@@ -23,8 +23,6 @@ type PwdBcrypt struct {
 	Cost int
 }
 
-const DRIVER_NAME = "bcrypt"
-
 func (t *PwdBcrypt) Id() string {
 	return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_NAME)
 }

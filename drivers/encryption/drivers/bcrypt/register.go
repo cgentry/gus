@@ -11,20 +11,20 @@ type registerDriver struct{}
 
 // Register is a simple wrapper to make sure registration occurs properly
 func Register() {
-	gdriver.Register(encryption.DRIVER_GROUP, &registerDriver)
+	gdriver.Register(encryption.DRIVER_GROUP, &registerDriver{})
 }
 
-func (r *registerDriver) New() EncryptDriver {
+func (r *registerDriver) New() interface{} {
 	return New()
 }
 
 func (r *registerDriver) Identity(id int) string {
 	switch id {
-	case IDENT_NAME:
+	case gdriver.IDENT_NAME:
 		return "BCrypt"
-	case IDENT_SHORT:
+	case gdriver.IDENT_SHORT:
 		return "Standard high-quality encryption using BCRYPT methods"
-	case IDENT_LONG:
+	case gdriver.IDENT_LONG:
 		return const_bcrypt_help_template
 	}
 	return "unknown"
