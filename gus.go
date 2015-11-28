@@ -133,7 +133,7 @@ func runtimeFail(msg string, err error) {
 	var emsg string
 	if err == nil {
 		emsg = "(runtime error)"
-	}else{
+	} else {
 		emsg = err.Error()
 	}
 	if len(emsg) > len(msg) {

@@ -19,24 +19,29 @@ import (
 )
 
 type PwdBcrypt struct {
-	Salt  string
-	Cost  int
+	Salt string
+	Cost int
 }
 
 const DRIVER_NAME = "bcrypt"
 
-
-func (t *PwdBcrypt) Id() string        { return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_NAME) }
-func (t *PwdBcrypt) ShortHelp() string { return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_SHORT) }
-func (t *PwdBcrypt) LongHelp() string  { return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_LONG) }
+func (t *PwdBcrypt) Id() string {
+	return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_NAME)
+}
+func (t *PwdBcrypt) ShortHelp() string {
+	return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_SHORT)
+}
+func (t *PwdBcrypt) LongHelp() string {
+	return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_LONG)
+}
 
 // New will create a BCRYPT strucutre. The salt is given a static string but
 // can be set up on selection from the driver. This must be the same with every
 // load or you won't be able to login anymore.
 func New() *PwdBcrypt {
 	c := &PwdBcrypt{
-		Cost:  7,
-		Salt:  "vniiO5UD0w5GpJkPijwQCT63MuMjyWnyi5TtUWBGInCq84zaFFsSwGm9DK8UyUeQp{2h&gV,KoQi9ysC",
+		Cost: 7,
+		Salt: "vniiO5UD0w5GpJkPijwQCT63MuMjyWnyi5TtUWBGInCq84zaFFsSwGm9DK8UyUeQp{2h&gV,KoQi9ysC",
 	}
 	return c
 }

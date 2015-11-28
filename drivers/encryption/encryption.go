@@ -12,18 +12,20 @@
 package encryption
 
 import (
-	"github.com/cgentry/gdriver"
 	"encoding/json"
+	"github.com/cgentry/gdriver"
 	"strings"
 )
 
-const DRIVER_GROUP="encryption"
+const DRIVER_GROUP = "encryption"
 
 // The interface gives the set of methods that an encryption driver must implement.
 type EncryptDriver interface {
 	EncryptPassword(password string, salt string) string
 	ComparePasswords(string, string, string) bool
 	Setup(string) EncryptDriver
+
+	//  The following are wrappers for the gdriver routines.
 	Id() string
 	ShortHelp() string
 	LongHelp() string
@@ -48,10 +50,10 @@ func UnmarshalOptions(jsonOption string) (opt *CryptOptions, err error) {
 	return
 }
 
-
 // Pick a registered driver for use in the system. Only one driver can be selected at a time.
+// This will panic if no drivers have been registered
 func Select(name string) EncryptDriver {
-	return gdriver.NewMust( DRIVER_GROUP, name )
+	return gdriver.NewMust(DRIVER_GROUP, name).(EncryptDriver)
 }
 
 func GetStaticSalt(offset int) string {

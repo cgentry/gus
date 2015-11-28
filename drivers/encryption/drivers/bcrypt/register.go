@@ -7,20 +7,18 @@ import (
 
 const DRIVER_NAME = "bcrypt"
 
-type Register struct {}
+type registerDriver struct{}
 
-// init will register this driver for use.
-func init() {
-	gdriver.Register(encryption.DRIVER_GROUP,&RegisterBCrypt  )
+// Register is a simple wrapper to make sure registration occurs properly
+func Register() {
+	gdriver.Register(encryption.DRIVER_GROUP, &registerDriver)
 }
 
-
-func ( r *Register ) New() EncryptDriver {
+func (r *registerDriver) New() EncryptDriver {
 	return New()
 }
 
-
-func ( r *Register ) Identity( id int ) string {
+func (r *registerDriver) Identity(id int) string {
 	switch id {
 	case IDENT_NAME:
 		return "BCrypt"

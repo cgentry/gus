@@ -5,27 +5,27 @@ import (
 	"github.com/cgentry/gus/drivers/encryption"
 )
 
-const DRIVER_NAME = "plaintext"
+const DRIVER_NAME = "SHA512"
 
-type Register struct{}
+type registerDriver struct{}
 
-// init will register this driver for use.
-func init() {
-	gdriver.Register(encryption.DRIVER_GROUP, &Register)
+// Register is a simple wrapper to make sure registration occurs properly
+func Register() {
+	gdriver.Register(encryption.DRIVER_GROUP, &registerDriver)
 }
 
-func (r *Register) New() EncryptDriver {
+func (r *registerDriver) New() EncryptDriver {
 	return New()
 }
 
-func (r *Register) Identity(id int) string {
+func (r *registerDriver) Identity(id int) string {
 	switch id {
 	case IDENT_NAME:
-		return "plaintext"
+		return DRIVER_NAME
 	case IDENT_SHORT:
-		return "For testing only! Do not use in production"
+		return "Standard quality encryption using SHA512 methods"
 	case IDENT_LONG:
-		return const_plain_help_template
+		return const_sha512_help_template
 	}
 	return "unknown"
 }

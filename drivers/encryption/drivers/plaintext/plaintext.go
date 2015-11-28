@@ -1,34 +1,30 @@
 package plaintext
 
 import (
-	"github.com/cgentry/gus/encryption"
+	"github.com/cgentry/gdriver"
+	"github.com/cgentry/gus/drivers/encryption"
 )
 
-const ENCRYPTION_DRIVER_ID = "plaintext"
-
 type PwdPlaintext struct {
-	Name  string
-	Salt  string
-	Short string
-	Long  string
+	Salt string
 }
 
 func New() *PwdPlaintext {
 	c := &PwdPlaintext{
-		Name:  ENCRYPTION_DRIVER_ID,
-		Short: "For testing only! Do not use in production",
-		Long:  const_plain_help_template,
-		Salt:  "SALT",
+		Salt: "SALT",
 	}
 	return c
 }
 
-func init() {
-	encryption.Register(New())
+func (t *PwdPlaintext) Id() string {
+	return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_NAME)
 }
-func (t *PwdPlaintext) Id() string        { return t.Name }
-func (t *PwdPlaintext) ShortHelp() string { return t.Short }
-func (t *PwdPlaintext) LongHelp() string  { return t.Long }
+func (t *PwdPlaintext) ShortHelp() string {
+	return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_SHORT)
+}
+func (t *PwdPlaintext) LongHelp() string {
+	return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_LONG)
+}
 
 // EncryptPassword will encrypt the password using the magic number within the record.
 // This should be sufficient to protect it but still allow us to re-create later on.

@@ -3,7 +3,7 @@ package service
 import (
 	"encoding/json"
 	"github.com/cgentry/gus/ecode"
-	_ "github.com/cgentry/gus/encryption/drivers/plaintext"
+	_ "github.com/cgentry/gus/drivers/encryption/drivers/plaintext"
 	"github.com/cgentry/gus/record/head"
 	"github.com/cgentry/gus/record/request"
 	"github.com/cgentry/gus/record/response"

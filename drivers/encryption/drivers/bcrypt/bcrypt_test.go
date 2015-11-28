@@ -1,7 +1,7 @@
 package bcrypt
 
 import (
-	"github.com/cgentry/gus/encryption"
+	"github.com/cgentry/gus/drivers/encryption"
 	"github.com/cgentry/gus/record/tenant"
 	"testing"
 )

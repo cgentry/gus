@@ -3,42 +3,36 @@ package sha512
 import (
 	"crypto/sha512"
 	"encoding/base64"
-	"github.com/cgentry/gus/encryption"
+	"github.com/cgentry/gus/drivers/encryption"
 
 	//"time"
 )
 
 type PwdSha512 struct {
-	Name  string
-	Salt  string
-	Cost  int
-	Short string
-	Long  string
+	Salt string
+	Cost int
 }
-
-const ENCRYPTION_DRIVER_ID = "sha512"
 
 // Create a new SHA512 encryption. The salt is given a static string but
 // can be set up on selection from the driver. This must be the same with every
 // load or you won't be able to login anymore.
 func New() *PwdSha512 {
 	c := &PwdSha512{
-		Name:  ENCRYPTION_DRIVER_ID,
-		Short: "Standard quality encryption using SHA512 methods",
-		Long:  const_sha512_help_template,
-		Cost:  4,
-		Salt:  "9u4K6f6pKmpUqF%Cgo9$c2rJfZEPut//ziRbrda8A2KQctVxWYKrUCX28GDww.t6jwqay%van6e9CSo^gtfyUeQp{2h&gV,KoQi9ysC",
+		Cost: 4,
+		Salt: "9u4K6f6pKmpUqF%Cgo9$c2rJfZEPut//ziRbrda8A2KQctVxWYKrUCX28GDww.t6jwqay%van6e9CSo^gtfyUeQp{2h&gV,KoQi9ysC",
 	}
 	return c
 }
 
-func init() {
-	encryption.Register(New())
+func (t *PwdSha512) Id() string {
+	return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_NAME)
 }
-
-func (t *PwdSha512) Id() string        { return t.Name }
-func (t *PwdSha512) ShortHelp() string { return t.Short }
-func (t *PwdSha512) LongHelp() string  { return t.Long }
+func (t *PwdSha512) ShortHelp() string {
+	return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_SHORT)
+}
+func (t *PwdSha512) LongHelp() string {
+	return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_LONG)
+}
 
 // EncryptPassword will encrypt the password using the user's salt and our salt.
 // This will be re-iterated for 'cost' number of times.

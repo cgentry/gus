@@ -4,13 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cgentry/gus/cli"
-	"github.com/cgentry/gus/encryption"
+	"github.com/cgentry/gus/drivers/encryption"
 	"github.com/cgentry/gus/record/configure"
 	"github.com/cgentry/gus/record/mappers"
 	"github.com/cgentry/gus/record/tenant"
 	"github.com/cgentry/gus/storage"
-	"os"
 	"io/ioutil"
+	"os"
 )
 
 const (
@@ -76,7 +76,6 @@ func init() {
 	cmdUserAdd.Run = runUserAdd
 	addCommonCommandFlags(cmdUserAdd)
 
-
 	cmdUserLoad.Run = runUserLoad
 	addCommonCommandFlags(cmdUserLoad)
 }
@@ -90,7 +89,7 @@ func runUser(cmd *cli.Command, args []string) {
 	cmd.Flag.Parse(args[1:])
 	args = cmd.Flag.Args()
 
-	if subCommand != "add" && subCommand != "load"{
+	if subCommand != "add" && subCommand != "load" {
 		if cmdUserCli.Domain == "" {
 			err = errors.New("Domain is required for " + subCommand)
 		} else if cmdUserCli.Email == "" && cmdUserCli.LoginName == "" {
@@ -110,8 +109,8 @@ func runUser(cmd *cli.Command, args []string) {
 		runUserEnable(cmd, args)
 	case subCommand == "disable":
 		runUserDisable(cmd, args)
-	case subCommand == "load" :
-		runUserLoad(cmd,args)
+	case subCommand == "load":
+		runUserLoad(cmd, args)
 	default:
 		err = errors.New("Invalid add command: " + subCommand)
 	}
@@ -196,8 +195,7 @@ func runUserShow(cmd *cli.Command, args []string) {
 }
 
 // runUserLoad will load up the current store from a JSON list
-func runUserLoad( cmd *cli.Command, args []string ){
-
+func runUserLoad(cmd *cli.Command, args []string) {
 
 	c, err := GetConfigFile()
 	if err != nil {
@@ -205,46 +203,51 @@ func runUserLoad( cmd *cli.Command, args []string ){
 	}
 
 	if len(args) < 1 {
-		runtimeFail("No load file passed" , nil )
+		runtimeFail("No load file passed", nil)
 	}
 	loadFile := args[0]
-	err = LoadUsersFromJson( cmd , loadFile )
+	err = LoadUsersFromJson(cmd, loadFile)
 	if err != nil {
-		runtimeFail( "Loading user data from " + loadFile , err )
+		runtimeFail("Loading user data from "+loadFile, err)
 	}
 }
 
 // LoadUsersFromJson will load up the store, either clients or users, from
 // the JSON file.
-func LoadUsersFromJson( c *configure.Configure, loadFile string ) ( err error ){
+func LoadUsersFromJson(c *configure.Configure, loadFile string) (err error) {
 	var fdata string
 	var users *[]tenant.UserCli
 	var oneUser tenant.User
 
 	_, err = os.Stat(loadFile)
-	if err!= nil {
+	if err != nil {
 		return
 	}
 	fdata, err = ioutil.ReadFile(loadFile)
 	if err == nil {
 		err = json.Unmarshal(fdata, users)
-		if err != nil { runtimeFail( "Reading JSON file " , err )
-			clientStore, err := storage.Open( c.Client.Name, c.Client.Dsn, c.Client.Options)
-			if err != nil { return err }
+		if err != nil {
+			runtimeFail("Reading JSON file ", err)
+			clientStore, err := storage.Open(c.Client.Name, c.Client.Dsn, c.Client.Options)
+			if err != nil {
+				return err
+			}
 			defer clientStore.Close()
 
-			userStore, err := storage.Open( c.User.Name , c.User.Dsn, c.User.Options )
-			if err != nil { return err }
+			userStore, err := storage.Open(c.User.Name, c.User.Dsn, c.User.Options)
+			if err != nil {
+				return err
+			}
 			defer userStore.Close()
 
 			for oneUserCli := range users {
-				err = mappers.UserFromCli( oneUser , oneUserCli)
+				err = mappers.UserFromCli(oneUser, oneUserCli)
 				if err != nil {
 					return
 				}
 				if oneUser.IsSystem {
-					err = clientStore.Insert(oneUser )
-				}else {
+					err = clientStore.Insert(oneUser)
+				} else {
 					err = userStore.Insert(oneUser)
 				}
 				if err != nil {

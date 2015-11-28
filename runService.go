@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/cgentry/gus/cli"
-	"github.com/cgentry/gus/encryption"
+	"github.com/cgentry/gus/drivers/encryption"
 	"github.com/cgentry/gus/service/web"
 )
 

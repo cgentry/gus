@@ -1,8 +1,8 @@
 package mappers
 
 import (
-	"github.com/cgentry/gus/encryption"
-	_ "github.com/cgentry/gus/encryption/drivers/plaintext"
+	"github.com/cgentry/gus/drivers/encryption"
+	_ "github.com/cgentry/gus/drivers/encryption/drivers/plaintext"
 	"github.com/cgentry/gus/record/response"
 	"github.com/cgentry/gus/record/tenant"
 	. "github.com/smartystreets/goconvey/convey"

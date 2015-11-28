@@ -7,7 +7,7 @@ package tenant
 
 import (
 	"github.com/cgentry/gus/ecode"
-	"github.com/cgentry/gus/encryption"
+	"github.com/cgentry/gus/drivers/encryption"
 	"strings"
 	"time"
 )

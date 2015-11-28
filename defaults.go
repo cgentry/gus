@@ -9,10 +9,10 @@ import (
 	_ "github.com/cgentry/gus/storage/sqlite"
 
 	/* Encryption support */
-	_ "github.com/cgentry/gus/encryption/drivers/bcrypt"
-	_ "github.com/cgentry/gus/encryption/drivers/sha512"
+	_ "github.com/cgentry/gus/drivers/encryption/drivers/bcrypt"
+	_ "github.com/cgentry/gus/drivers/encryption/drivers/sha512"
 	/* REMOVE WHEN IN PRODUCTION */
-	_ "github.com/cgentry/gus/encryption/drivers/plaintext"
+	_ "github.com/cgentry/gus/drivers/encryption/drivers/plaintext"
 )
 
 const (

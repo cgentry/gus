@@ -9,7 +9,7 @@ import (
 	"errors"
 	"fmt"
 	. "github.com/cgentry/gus/ecode"
-	"github.com/cgentry/gus/encryption"
+	"github.com/cgentry/gus/drivers/encryption"
 	"github.com/cgentry/gus/record/configure"
 	"time"
 )
