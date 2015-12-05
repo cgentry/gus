@@ -4,6 +4,7 @@ import (
 	"crypto/sha512"
 	"encoding/base64"
 	"github.com/cgentry/gus/drivers/encryption"
+	"github.com/cgentry/gdriver"
 
 	//"time"
 )
@@ -15,7 +16,7 @@ type PwdSha512 struct {
 
 // Create a new SHA512 encryption. The salt is given a static string but
 // can be set up on selection from the driver. This must be the same with every
-// load or you won't be able to login anymore.
+// load or you won't be able to verify credentials.
 func New() *PwdSha512 {
 	c := &PwdSha512{
 		Cost: 4,
@@ -55,7 +56,8 @@ func (t *PwdSha512) EncryptPassword(clearPassword, userSalt string) string {
 	return base64.StdEncoding.EncodeToString(previousPass)
 }
 
-// This should be called  when the driver has been selected for use.
+// Setup should be called  when the driver has been selected for use. The options
+// are cross-encryption.. See the encryption for what these are.
 func (t *PwdSha512) Setup(jsonOption string) encryption.EncryptDriver {
 
 	opt, err := encryption.UnmarshalOptions(jsonOption)
@@ -63,15 +65,22 @@ func (t *PwdSha512) Setup(jsonOption string) encryption.EncryptDriver {
 		panic(err.Error())
 	}
 
-	if opt.Cost > 0 {
-		t.Cost = opt.Cost
-	}
-	if len(opt.Salt) > 0 {
-		t.Salt = opt.Salt
-	}
+	t.setCost( opt.Cost )
+	t.setSalt( opt.Salt )
 	return t
 }
 
+func ( t *PwdSha512 )setCost( newCostValue int ){
+	if opt.Cost > 0 {
+		t.Cost = newCostValue
+	}
+}
+
+func ( t *PwdSha512 ) setSalt( newEncryptionSalt string ){
+	if len(opt.Salt) > 0 {
+		t.Salt = newEncryptionSalt
+	}
+}
 func (t *PwdSha512) ComparePasswords(hashedPassword, clearPassword, salt string) bool {
 	return hashedPassword == t.EncryptPassword(clearPassword, salt)
 }

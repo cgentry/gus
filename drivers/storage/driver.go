@@ -98,12 +98,7 @@ type Store struct {
 // Open a connection to the storage mechanism and return both a storage
 // structure and an error status of the open
 func Open(name string, connect string, extraDriverOptions string) (*Store, error) {
-	s := &Store{
-		name:          name,
-		isOpen:        false,
-		connectString: connect,
-		lastError:     ErrNoDriverFound,
-	}
+
 	if driver, ok := driverMap[name]; ok {
 		s.driver = driver
 		s.connection, s.lastError = driver.Open(connect, extraDriverOptions)

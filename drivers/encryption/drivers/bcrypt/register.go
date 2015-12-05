@@ -27,5 +27,5 @@ func (r *registerDriver) Identity(id int) string {
 	case gdriver.IDENT_LONG:
 		return const_bcrypt_help_template
 	}
-	return "unknown"
+	return gdriver.IDENT_UNKNOWN
 }

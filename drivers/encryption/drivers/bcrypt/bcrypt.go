@@ -61,15 +61,24 @@ func (t *PwdBcrypt) Setup(jsonOptions string) encryption.EncryptDriver {
 			log.Printf("Bcrypt: Could not unmarshal '%s' options: ignored.", jsonOptions)
 			return t
 		}
-		if opt.Cost > 0 {
-			t.Cost = opt.Cost
-		}
-		if len(opt.Salt) > 0 {
-			t.Salt = opt.Salt
-		}
+		t.setCost( opt.Cost )
+		t.setSalt( opt.Salt )
 	}
 	return t
 }
+
+func ( t *PwdBcrypt )setCost( newCostValue int ){
+	if opt.Cost > 0 {
+		t.Cost = newCostValue
+	}
+}
+
+func ( t *PwdBrcypt ) setSalt( newEncryptionSalt string ){
+	if len(opt.Salt) > 0 {
+		t.Salt = newEncryptionSalt
+	}
+}
+
 
 // ComparePasswords must be called with a bcrypt password.
 func (t *PwdBcrypt) ComparePasswords(hashedPassword, clearPassword, userSalt string) bool {

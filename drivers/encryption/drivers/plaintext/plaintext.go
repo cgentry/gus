@@ -41,12 +41,17 @@ func (t *PwdPlaintext) Setup(json string) encryption.EncryptDriver {
 		panic(err.Error())
 	}
 
-	if len(opt.Salt) > 0 {
-		t.Salt = opt.Salt
-	}
+	t.setSalt( opt.Salt )
 
 	return t
 }
+
+func ( t *PwdPlaintext ) setSalt( newEncryptionSalt string ){
+	if len(opt.Salt) > 0 {
+		t.Salt = newEncryptionSalt
+	}
+}
+
 func (t *PwdPlaintext) ComparePasswords(hashedPassword, password, salt string) bool {
 	return hashedPassword == t.EncryptPassword(password, salt)
 }
