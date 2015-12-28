@@ -86,6 +86,7 @@ var ErrAlreadyRegistered = NewGeneralError("Storage driver already registered", 
 var ErrInternalDatabase = NewGeneralError("Internal storage error while executing operation", http.StatusInternalServerError)
 var ErrCannotSetId = NewGeneralError("User id cannot be set", http.StatusBadRequest)
 var ErrUserNotFound = NewGeneralError("User not found", http.StatusNotFound)
+var ErrAlreadyOpen  = NewGeneralError("Storage driver already open", http.StatusBadRequest)
 
 var ErrShortGuid = NewGeneralError("GUID must be at least 32 characters long", http.StatusInternalServerError)
 var ErrDuplicateGuid = NewGeneralError("User GUID already in use", http.StatusInternalServerError)

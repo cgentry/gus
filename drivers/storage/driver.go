@@ -19,94 +19,23 @@ const (
 )
 const driver_name = "Storage"
 
-// For domains, you need to handle the MATCH_ANY_DOMAIN as a parameter. This will be a placeholder
-// when there are UNIQUE keys (e.g. GUID and TOKEN)
-const MATCH_ANY_DOMAIN = `*`
-
-// All drivers that are registered are stored here.
-var driverMap = make(map[string]StorageDriver, 2)
-
-// Find the driver by the 'name' and add it into the map so it can be opened.
-// Each driver can only be registered once. To remove all drivers, call
-// ResetRegister()
-func Register(driver StorageDriver) error {
-	if driver == nil {
-		panic("Register driver is nil")
-	}
-	id := driver.Id()
-	if _, dup := driverMap[id]; dup {
-		return nil
-	}
-	driverMap[id] = driver
-
-	return nil
-}
-
-// Return a simple string respresentation of the drivers that are registered
-func String() string {
-	rtn := fmt.Sprintf("Length is %d\n", len(driverMap))
-	for key := range driverMap {
-		rtn = rtn + key + "\n"
-	}
-	return rtn
-}
-
-func GetMap() map[string]StorageDriver {
-	return driverMap
-}
-
-// Remove all the drivers that have been registered
-func ResetRegister() {
-	driverMap = make(map[string]StorageDriver, 2)
-}
-
-func IsRegistered(name string) bool {
-	_, ok := driverMap[name]
-	return ok
-}
-
-type Storer interface {
-	Close() error
-	GetStorageConnector() Conn
-	LastError() error
-	IsOpen() bool
-	Ping() error
-	Release() error
-	Reset()
-
-	FetchUserByEmail(domain, email string) (*tenant.User, error)
-	FetchUserByGuid(guid string) (*tenant.User, error)
-	FetchUserByLogin(domain, loginName string) (*tenant.User, error)
-	FetchUserByToken(token string) (*tenant.User, error)
-	UserFetch(domain, lookupKey, lookkupValue string) (*tenant.User, error)
-	UserInsert(user *tenant.User) error
-	UserUpdate(user *tenant.User) error
-}
-
-// Store holds the state for any storage driver. It allows you to have
-// consistent returns, such as getting the last error, discovering how
-// a connection was made (connectString) or the name of the driver (name)
-type Store struct {
-	name          string
-	connectString string
-	isOpen        bool
-	lastError     error
-	driver        StorageDriver
-	connection    Conn
-}
 
 // Open a connection to the storage mechanism and return both a storage
 // structure and an error status of the open
-func Open(name string, connect string, extraDriverOptions string) (*Store, error) {
+func (s *Store)Open(name string, connect string, extraDriverOptions string) error {
 
-	if driver, ok := driverMap[name]; ok {
-		s.driver = driver
-		s.connection, s.lastError = driver.Open(connect, extraDriverOptions)
+	if s.isOpen == true {
+		return s.saveLastError(ErrAlreadyOpen)
+	}
+	s.isOpen = false
+	s.lastError = nil
+	if opener, found := s.connection.(Opener); found {
+		s.lastError = opener.Open(connect, extraDriverOptions)
 	}
 	if s.lastError == nil {
 		s.isOpen = true
 	}
-	return s, s.lastError
+	return s.lastError
 }
 
 // Return the actual connection to the database for low-level access.
@@ -141,10 +70,30 @@ func (s *Store) saveLastError(e error) error {
 	return e
 }
 
-/*
- * Optional interfaces that may be provided by the storage mechanism.
- * If not provided, they should return a 'good' result rather than an error
+/* ======================================================
+ * 					Optional functions
+ * If not provided, they should return a 'good' result
+ * rather than an error
+ * ======================================================
  */
+
+// Open a connection to the storage mechanism and return both a storage
+// structure and an error status of the open
+func (s *Store) Open(name string, connect string, extraDriverOptions string) error {
+
+	if s.isOpen == true {
+		return s.saveLastError(ErrAlreadyOpen)
+	}
+	s.isOpen = false
+	s.lastError = nil
+	if opener, found := s.driver.(Opener); found {
+		s.lastError = opener.Open(connect, extraDriverOptions)
+	}
+	if s.lastError == nil {
+		s.isOpen = true
+	}
+	return s.lastError
+}
 
 // Reset any errors or intermediate conditions
 func (s *Store) Reset() {
@@ -198,8 +147,9 @@ func (s *Store) Ping() error {
 	return s.lastError
 }
 
-/*
- * Mandatory functions
+/* ======================================================
+ * 					Mandatory functions
+ * ======================================================
  */
 
 func (s *Store) UserUpdate(user *tenant.User) error {

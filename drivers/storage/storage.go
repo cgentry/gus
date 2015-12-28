@@ -1,13 +1,11 @@
-// The encryption drivers are used to encrypt and decrypt passwords stored for a user.
-// Standard encryption drivers are sha512, bcrypt and plaintext (not suitable for
-// production systems)
+// The storage drivers are used to store identification for a user and nothing more.
+// Standard encryption drivers are mock, sqlite, jsonfile and mysql.
 //
-// All drivers need to call Register in order to be usable by the system. Failure to select
-// an encryption driver will cause a panic during runtime.
 //
 // Drivers are selected by:
-//    crypt := encryption.Select( driverName ).Setup( options )
-// The call to Setup() is optional and driver specific.
+//    db := encryption.Select( driverName )
+// To conform to the gdriver interface, all drivers must have New() and Identity()
+// functions. To conform to the minimum storage driver, they must also have
 
 package storage
 
@@ -47,6 +45,8 @@ type Storer interface {
 	LongHelp() string
 }
 
+type storeMap map[string]Storer
+
 // Store holds the state for any storage driver. It allows you to have
 // consistent returns, such as getting the last error, discovering how
 // a connection was made (connectString) or the name of the driver (name)
@@ -68,7 +68,9 @@ func NewStore( name string ) *Store {
 	}
 }
 
-// Pick a registered driver for use in the system. Only one driver can be selected at a time.
+// Select will pick a registered driver for use in the system.
+// Only one driver can be selected at a time. Calling GetDriver will
+// return the current driver
 // This will panic if no drivers have been registered
 func Select(name string) *Store {
 	gdriver.Default(DRIVER_GROUP,name)

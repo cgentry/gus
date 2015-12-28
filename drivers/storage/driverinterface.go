@@ -4,17 +4,6 @@ import (
 	"github.com/cgentry/gus/record/tenant"
 )
 
-// The StorageDriver interface defines very general, high level operations for retrieval and storage of
-// data. The back-storage can be a flat file, database or document store.
-// The interfaces specify NO sql methods and flatten out operations
-type StorageDriver interface {
-	Open(connect string, extraDriverOptions string) (Conn, error)
-
-	Id() string
-	ShortHelp() string
-	LongHelp() string
-}
-
 // This is the minimum call set that every driver is required to implement
 type Conn interface {
 	UserUpdate(user *tenant.User) error
@@ -23,6 +12,9 @@ type Conn interface {
 	UserFetch(domain, key, value string) (*tenant.User, error)
 }
 
+type Opener interface {
+	Open(connect string, extraDriverOptions string) (Conn, error)
+}
 // Option Storge Creation interface
 type Creater interface {
 	CreateStore() error
