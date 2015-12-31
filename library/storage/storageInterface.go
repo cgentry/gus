@@ -4,6 +4,50 @@ import (
 	"github.com/cgentry/gus/record/tenant"
 )
 
+// The StorageDriver interface defines very general, high level operations for retrieval and storage of
+// data. The back-storage can be a flat file, database or document store.
+// The interfaces specify NO sql methods and flatten out operations
+type StorageDriver interface {
+	Open(connect string, extraDriverOptions string) (Conn, error)
+
+}
+
+
+// The interface gives the set of methods that a storage driver MAY implement.
+// Because some are optional, see the methods for Store for ones that
+// are required.
+
+type Storer interface {
+
+	// Required wrappers for required StorageDriver functions
+	Open(connect string, extraDriverOptions string) error
+	UserFetch(domain, lookupKey, lookkupValue string) (*tenant.User, error)
+	UserInsert(user *tenant.User) error
+	UserUpdate(user *tenant.User) error
+
+	// Optional device connection functions
+	Close() error
+	GetStorageConnector() Conn
+	LastError() error
+	IsOpen() bool
+	Ping() error
+	Release() error
+	Reset()
+
+
+	// The following are convienence wrapper functions for the UserXXX functions
+	FetchUserByEmail(domain, email string) (*tenant.User, error)
+	FetchUserByGuid(guid string) (*tenant.User, error)
+	FetchUserByLogin(domain, loginName string) (*tenant.User, error)
+	FetchUserByToken(token string) (*tenant.User, error)
+
+	//  The following are wrappers for the gdriver routines.
+	Id() string
+	ShortHelp() string
+	LongHelp() string
+}
+
+
 // This is the minimum call set that every driver is required to implement
 type Conn interface {
 	UserUpdate(user *tenant.User) error
@@ -45,3 +89,5 @@ type Pinger interface {
 type Releaser interface {
 	Release() error
 }
+
+

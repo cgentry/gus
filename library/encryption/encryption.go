@@ -25,7 +25,7 @@ type EncryptDriver interface {
 	ComparePasswords(string, string, string) bool
 	Setup(string) EncryptDriver
 
-	//  The following are wrappers for the gdriver routines.
+	//  The following are wrappers for the gdriver Id call.
 	Id() string
 	ShortHelp() string
 	LongHelp() string

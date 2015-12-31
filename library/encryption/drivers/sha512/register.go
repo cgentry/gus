@@ -1,11 +1,11 @@
-package bcrypt
+package sha512
 
 import (
 	"github.com/cgentry/gdriver"
-	"github.com/cgentry/gus/drivers/encryption"
+	"github.com/cgentry/gus/library/encryption"
 )
 
-const DRIVER_NAME = "bcrypt"
+const DRIVER_NAME = "SHA512"
 
 type registerDriver struct{}
 
@@ -21,11 +21,11 @@ func (r *registerDriver) New() interface{} {
 func (r *registerDriver) Identity(id int) string {
 	switch id {
 	case gdriver.IDENT_NAME:
-		return "BCrypt"
+		return DRIVER_NAME
 	case gdriver.IDENT_SHORT:
-		return "Standard high-quality encryption using BCRYPT methods"
+		return "Standard quality encryption using SHA512 methods"
 	case gdriver.IDENT_LONG:
-		return const_bcrypt_help_template
+		return const_sha512_help_template
 	}
 	return gdriver.IDENT_UNKNOWN
 }

@@ -3,7 +3,7 @@ package sha512
 import (
 	"crypto/sha512"
 	"encoding/base64"
-	"github.com/cgentry/gus/drivers/encryption"
+	"github.com/cgentry/gus/library/encryption"
 	"github.com/cgentry/gdriver"
 
 	//"time"

@@ -1,11 +1,22 @@
 Storage drivers must follow these rules in order to work properly:
 
-1. They must register themselves with the storage driver:
-  func init() {
-  	storage.Register(name_to_use_for_selection, &DriverStructure{})
-  }
+1. They must follow the gdriver interface and have:
+    New()
+    Identify(ident)
 
-2. The driver (identified by the DriverStructure) must have one function: Open():
+2. They must follow the **StorageDriver** interface (defined in storageInterface.go) for a minimum
+  list of requirements.
+  
+3. Each driver has an interface layer (Store) that acts as an interface layer:
+  
+  CALLER ---->  Store -----> Driver
+  
+  Store defines any possible call. It then casts the selected Driver to the inteface. for example,
+  if you are calling Ping() it will peform callPing, ok := store.Driver.(Ping) and if if fails then Ping() is not
+  implemented by the driver. If it succeeds then it calls the cast Ping class.
+  
+
+2. The driver (identified within the DriverStructure) must have one function: Open():
 
     func (t DriverStructure) Open(dsnConnect string, options string) (storage.Conn, error)
 

@@ -1,11 +1,11 @@
-package sha512
+package plaintext
 
 import (
 	"github.com/cgentry/gdriver"
-	"github.com/cgentry/gus/drivers/encryption"
+	"github.com/cgentry/gus/library/encryption"
 )
 
-const DRIVER_NAME = "SHA512"
+const DRIVER_NAME = "plaintext"
 
 type registerDriver struct{}
 
@@ -21,11 +21,11 @@ func (r *registerDriver) New() interface{} {
 func (r *registerDriver) Identity(id int) string {
 	switch id {
 	case gdriver.IDENT_NAME:
-		return DRIVER_NAME
+		return "plaintext"
 	case gdriver.IDENT_SHORT:
-		return "Standard quality encryption using SHA512 methods"
+		return "For testing only! Do not use in production"
 	case gdriver.IDENT_LONG:
-		return const_sha512_help_template
+		return const_plain_help_template
 	}
 	return gdriver.IDENT_UNKNOWN
 }

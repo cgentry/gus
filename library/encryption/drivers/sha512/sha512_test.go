@@ -1,7 +1,7 @@
-package bcrypt
+package sha512
 
 import (
-	"github.com/cgentry/gus/drivers/encryption"
+	"github.com/cgentry/gus/library/encryption"
 	"github.com/cgentry/gus/record/tenant"
 	"testing"
 )
@@ -15,12 +15,12 @@ func TestGenerate(t *testing.T) {
 	}
 }
 
-func TestCompare(t *testing.T) {
+func TestRepeatable(t *testing.T) {
 	user := tenant.NewTestUser()
 	pwd := encryption.GetDriver().EncryptPassword("123456", user.Salt)
-
-	if !encryption.GetDriver().ComparePasswords(pwd, "123456", user.Salt) {
-		t.Errorf("Passwords didn't match")
+	pwd2 := encryption.GetDriver().EncryptPassword("123456", user.Salt)
+	if pwd != pwd2 {
+		t.Errorf("Passwords didn't match: '%s' and '%s'", pwd, pwd2)
 	}
 
 }
@@ -29,7 +29,7 @@ func TestIsLongEnough(t *testing.T) {
 	user := tenant.NewTestUser()
 	pwd := encryption.GetDriver().EncryptPassword("hello", user.Salt)
 	pwdLen := len(pwd)
-	if pwdLen < 60 {
+	if pwdLen != 88 {
 		t.Errorf("PWD isn't long enough %d", pwdLen)
 	}
 }
@@ -47,7 +47,7 @@ func TestSimilarUserDifferntPwd(t *testing.T) {
 func TestAfterChangingSalt(t *testing.T) {
 	user := tenant.NewTestUser()
 	pwd := encryption.GetDriver().EncryptPassword("123456", user.Salt)
-	encryption.GetDriver().Setup(`{ "Salt": "hello - this should screw up password" }`)
+	encryption.GetDriver().Setup("{ \"Salt\": \"hello - this should screw up password\" }")
 	pwd2 := encryption.GetDriver().EncryptPassword("123456", user.Salt)
 
 	if pwd == pwd2 {

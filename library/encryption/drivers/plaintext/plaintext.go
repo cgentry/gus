@@ -2,7 +2,7 @@ package plaintext
 
 import (
 	"github.com/cgentry/gdriver"
-	"github.com/cgentry/gus/drivers/encryption"
+	"github.com/cgentry/gus/library/encryption"
 )
 
 type PwdPlaintext struct {

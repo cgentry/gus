@@ -1,7 +1,7 @@
 package plaintext
 
 import (
-	"github.com/cgentry/gus/drivers/encryption"
+	"github.com/cgentry/gus/library/encryption"
 	"github.com/cgentry/gus/record/tenant"
 	"testing"
 )

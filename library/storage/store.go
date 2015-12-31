@@ -1,9 +1,9 @@
 package storage
 
 import (
-	"fmt"
 	. "github.com/cgentry/gus/ecode"
 	"github.com/cgentry/gus/record/tenant"
+	"github.com/cgentry/gdriver"
 )
 
 // These are the names of fields we expect to occur in the database and will
@@ -19,24 +19,27 @@ const (
 )
 const driver_name = "Storage"
 
+const MATCH_ANY_DOMAIN = "*"
 
-// Open a connection to the storage mechanism and return both a storage
-// structure and an error status of the open
-func (s *Store)Open(name string, connect string, extraDriverOptions string) error {
 
-	if s.isOpen == true {
-		return s.saveLastError(ErrAlreadyOpen)
-	}
-	s.isOpen = false
-	s.lastError = nil
-	if opener, found := s.connection.(Opener); found {
-		s.lastError = opener.Open(connect, extraDriverOptions)
-	}
-	if s.lastError == nil {
-		s.isOpen = true
-	}
-	return s.lastError
+/* ======================================================
+ * 					Store functions
+ * ======================================================
+ */
+
+
+func ( s *Store ) Id() string {
+	return s.rawDriver.Identity( gdriver.IDENT_NAME )
 }
+
+func ( s *Store ) ShortHelp() string {
+	return s.rawDriver.Identity( gdriver.IDENT_SHORT )
+}
+
+func ( s *Store ) LongHelp() string {
+	return s.rawDriver.Identity( gdriver.IDENT_LONG )
+}
+
 
 // Return the actual connection to the database for low-level access.
 // This should be avoided unless you are coding for a very non-portable
@@ -64,93 +67,36 @@ func (s *Store) IsOpen() bool {
 	return s.isOpen
 }
 
-// Save the last error for later retrieval, and return the error
-func (s *Store) saveLastError(e error) error {
-	s.lastError = e
-	return e
+func ( s *Store ) saveLastError( err error ) error {
+	s.lastError = err
+	return err
 }
 
+func ( s *Store ) ClearErrors(){
+	s.lastError = nil
+}
+
+
 /* ======================================================
- * 					Optional functions
- * If not provided, they should return a 'good' result
- * rather than an error
+ * 					Mandatory functions
+ *		StorageDriver
  * ======================================================
  */
 
 // Open a connection to the storage mechanism and return both a storage
 // structure and an error status of the open
-func (s *Store) Open(name string, connect string, extraDriverOptions string) error {
+func (s *Store) Open(connect string, extraDriverOptions string) error {
 
 	if s.isOpen == true {
 		return s.saveLastError(ErrAlreadyOpen)
 	}
 	s.isOpen = false
 	s.lastError = nil
-	if opener, found := s.driver.(Opener); found {
-		s.lastError = opener.Open(connect, extraDriverOptions)
-	}
-	if s.lastError == nil {
-		s.isOpen = true
-	}
+	s.connectString = connect
+	s.connection, s.lastError = s.driver.Open( connect, extraDriverOptions )
+
 	return s.lastError
 }
-
-// Reset any errors or intermediate conditions
-func (s *Store) Reset() {
-	s.SetLastError(nil)
-	if reseter, found := s.connection.(Reseter); found {
-		reseter.Reset()
-	}
-	return
-}
-
-// Release any locks or memory
-func (s *Store) Release() error {
-	s.SetLastError(nil)
-	if release, found := s.connection.(Releaser); found {
-		s.SetLastError(release.Release())
-	}
-	return s.LastError()
-}
-
-// Close the connection to the storage mechanism. If there is no close routine
-// ignore the call
-func (s *Store) Close() error {
-	if s.isOpen != true {
-		return s.saveLastError(ErrNotOpen)
-	}
-	s.isOpen = false
-	s.lastError = nil
-	if closer, found := s.connection.(Closer); found {
-		s.lastError = closer.Close()
-	}
-	return s.lastError
-}
-
-// If implemented, create the basic storage. If not implemented, an error will be returned.
-func (s *Store) CreateStore() error {
-	if s.isOpen != true {
-		return s.saveLastError(ErrNotOpen)
-	}
-
-	if creater, found := s.connection.(Creater); found {
-		return s.saveLastError(creater.CreateStore())
-	}
-	return ErrNoSupport
-}
-
-func (s *Store) Ping() error {
-	s.lastError = nil
-	if pinger, found := s.connection.(Pinger); found {
-		s.lastError = pinger.Ping()
-	}
-	return s.lastError
-}
-
-/* ======================================================
- * 					Mandatory functions
- * ======================================================
- */
 
 func (s *Store) UserUpdate(user *tenant.User) error {
 	if !s.isOpen {
@@ -185,6 +131,66 @@ func (s *Store) UserFetch(domain, lookupKey, lookkupValue string) (*tenant.User,
 	s.lastError = err
 	return rec, err
 }
+
+/* ======================================================
+ * 					Optional functions
+ * If not provided, they should return a 'good' result
+ * rather than an error
+ * ======================================================
+ */
+
+// Reset any errors or intermediate conditions
+func (s *Store) Reset() {
+	s.ClearErrors()
+	if reseter, found := s.connection.(Reseter); found {
+		reseter.Reset()
+	}
+	return
+}
+
+// Release any locks or memory
+func (s *Store) Release() error {
+	s.ClearErrors()
+	if release, found := s.connection.(Releaser); found {
+		s.SetLastError(release.Release())
+	}
+	return s.LastError()
+}
+
+// Close the connection to the storage mechanism. If there is no close routine
+// ignore the call
+func (s *Store) Close() error {
+	if s.isOpen != true {
+		return s.saveLastError(ErrNotOpen)
+	}
+	s.isOpen = false
+	s.ClearErrors()
+	if closer, found := s.connection.(Closer); found {
+		s.lastError = closer.Close()
+	}
+	return s.lastError
+}
+
+// If implemented, create the basic storage. If not implemented, an error will be returned.
+func (s *Store) CreateStore() error {
+	if s.isOpen != true {
+		return s.saveLastError(ErrNotOpen)
+	}
+
+	if creater, found := s.connection.(Creater); found {
+		return s.saveLastError(creater.CreateStore())
+	}
+	return ErrNoSupport
+}
+
+func (s *Store) Ping() error {
+	s.ClearErrors()
+	if pinger, found := s.connection.(Pinger); found {
+		s.lastError = pinger.Ping()
+	}
+	return s.lastError
+}
+
 
 /* ------------------------ THE FOLLOWING ARE 'CONVENIENCE' FUNCTIONS ***********************/
 
