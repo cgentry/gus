@@ -1,7 +1,7 @@
 package tenant
 
 import (
-	_ "github.com/cgentry/gus/drivers/encryption/drivers/plaintext"
+	_ "github.com/cgentry/gus/library/encryption/drivers/plaintext"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 	//"fmt"

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/cgentry/gus/cli"
 	"github.com/cgentry/gus/record/tenant"
-	"github.com/cgentry/gus/storage"
+	"github.com/cgentry/gus/library/storage"
 	"os"
 	"strings"
 )

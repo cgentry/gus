@@ -14,7 +14,7 @@ import (
 	"github.com/cgentry/gus/record/request"
 	"github.com/cgentry/gus/record/response"
 	"github.com/cgentry/gus/record/tenant"
-	"github.com/cgentry/gus/storage"
+	"github.com/cgentry/gus/library/storage"
 	"net/http"
 )
 

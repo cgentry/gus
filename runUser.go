@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cgentry/gus/cli"
-	"github.com/cgentry/gus/drivers/encryption"
+	"github.com/cgentry/gus/library/encryption"
 	"github.com/cgentry/gus/record/configure"
 	"github.com/cgentry/gus/record/mappers"
 	"github.com/cgentry/gus/record/tenant"
-	"github.com/cgentry/gus/storage"
+	"github.com/cgentry/gus/library/storage"
 	"io/ioutil"
 	"os"
 )

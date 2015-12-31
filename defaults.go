@@ -6,13 +6,13 @@ package main
 import (
 	/*  Database support. This is compiled in and available for selection.
 	    To remove the support (and overhead) you should comment it out. */
-	_ "github.com/cgentry/gus/storage/sqlite"
+	_ "github.com/cgentry/gus/library/storage/sqlite"
 
 	/* Encryption support */
-	_ "github.com/cgentry/gus/drivers/encryption/drivers/bcrypt"
-	_ "github.com/cgentry/gus/drivers/encryption/drivers/sha512"
+	_ "github.com/cgentry/gus/library/encryption/drivers/bcrypt"
+	_ "github.com/cgentry/gus/library/encryption/drivers/sha512"
 	/* REMOVE WHEN IN PRODUCTION */
-	_ "github.com/cgentry/gus/drivers/encryption/drivers/plaintext"
+	_ "github.com/cgentry/gus/library/encryption/drivers/plaintext"
 )
 
 const (

@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/cgentry/gus/cli"
-	"github.com/cgentry/gus/drivers/encryption"
-	"github.com/cgentry/gus/storage"
+	"github.com/cgentry/gus/library/encryption"
+	"github.com/cgentry/gus/library/storage"
 	"os"
 )
 
