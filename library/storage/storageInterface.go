@@ -2,6 +2,7 @@ package storage
 
 import (
 	"github.com/cgentry/gus/record/tenant"
+	"github.com/cgentry/gdriver"
 )
 
 // The StorageDriver interface defines very general, high level operations for retrieval and storage of
@@ -26,6 +27,7 @@ type Storer interface {
 	UserUpdate(user *tenant.User) error
 
 	// Optional device connection functions
+	CreateStore() error
 	Close() error
 	GetStorageConnector() Conn
 	LastError() error
@@ -45,6 +47,13 @@ type Storer interface {
 	Id() string
 	ShortHelp() string
 	LongHelp() string
+
+	// Internal routines
+	SetDriverInterface( x gdriver.DriverInterface  )
+	GetDriverInterface() gdriver.DriverInterface
+
+	SetStorageDriver( x StorageDriver )
+	GetStorageDriver( ) StorageDriver
 }
 
 

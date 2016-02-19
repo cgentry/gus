@@ -52,15 +52,19 @@ func UnmarshalOptions(jsonOption string) (opt *CryptOptions, err error) {
 
 // Pick a registered driver for use in the system. Only one driver can be selected at a time.
 // This will panic if no drivers have been registered
-func Select(name string) EncryptDriver {
+func SetDefault(name string) EncryptDriver {
 	gdriver.Default(DRIVER_GROUP,name)
 	return gdriver.MustNew(DRIVER_GROUP, name).(EncryptDriver)
 }
 
 
 // This will panic if no drivers have been registered
-func GetDriver() EncryptDriver {
+func GetDefaultDriver() EncryptDriver {
 	return gdriver.MustNewDefault(DRIVER_GROUP).(EncryptDriver)
+}
+
+func GetDriver( name string ) EncryptDriver {
+	return gdriver.MustNew( DRIVER_GROUP, name ).(EncryptDriver)
 }
 
 func GetStaticSalt(offset int) string {

@@ -50,7 +50,7 @@ func TestRegister(t *testing.T) {
 
 	gdriver.Register( DRIVER_GROUP, &tDriver1{})
 
-	drv := Select( "name")
+	drv := SetDefault( "name")
 	if "name" != drv.Id() {
 		t.Error("Name returned was not 'name': " + drv.Id() )
 	}

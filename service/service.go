@@ -150,22 +150,25 @@ func (s *ServiceProcess) SetupService(c *configure.Configure, requestPackage str
 	s.ResponsePackage.GetHead().SetSequence(pack.GetHead().GetSequence())
 	s.ResponsePackage.GetHead().SetId(pack.GetHead().GetId())
 
-	// Open up the storage handles. We only need the UserStore as the ClientStore is transitory
-	// and only used to read in the client record.
-	s.UserStore, err = storage.Open(s.Config.User.Name, s.Config.User.Dsn, s.Config.User.Options)
+	// Open the storage handles.
+	// UserStore is where we store external users
+	// ClientStore is where we store internal users. This may, or may not, be separate.
+	s.UserStore = storage.SetDefault(s.Config.User.Name)
+	err 		=	s.UserStore.Open( s.Config.User.Dsn, s.Config.User.Options)
 	if err != nil {
 		return s.PackageErr(err)
 	}
 	s.SetFlag = true
 	if s.Config.Service.ClientStore {
-		var clientStore *storage.Store
-		clientStore, err = storage.Open(s.Config.User.Name, s.Config.User.Dsn, s.Config.User.Options)
+		var clientStore storage.Storer
+		clientStore = storage.GetDriver( s.Config.Client.Name)
+		err = clientStore.Open( s.Config.Client.Dsn, s.Config.Client.Options)
 		if err == nil {
 			s.Client, err = clientStore.FetchUserByLogin(s.RequestHead.Domain, s.RequestHead.Id)
 			if err != nil {
 				clientStore.Release()
-				clientStore.Close()
 			}
+			clientStore.Close()
 		}
 	} else {
 		s.Client, err = s.UserStore.FetchUserByLogin(s.RequestHead.Domain, s.RequestHead.Id)

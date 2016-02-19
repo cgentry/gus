@@ -31,6 +31,10 @@ func Register() {
 	gdriver.Register(storage.DRIVER_GROUP, &registerDriver{})
 }
 
+func SetDefault() {
+	gdriver.Default(storage.DRIVER_GROUP,DRIVER_NAME)
+}
+
 // New() will return the resutls of the Sqlite New() function. You must cast
 // this on return to the proper type (StorageDriver)
 func (r *registerDriver) New() interface{} {

@@ -68,13 +68,13 @@ func (t *PwdBcrypt) Setup(jsonOptions string) encryption.EncryptDriver {
 }
 
 func ( t *PwdBcrypt )setCost( newCostValue int ){
-	if opt.Cost > 0 {
+	if newCostValue > 0 {
 		t.Cost = newCostValue
 	}
 }
 
-func ( t *PwdBrcypt ) setSalt( newEncryptionSalt string ){
-	if len(opt.Salt) > 0 {
+func ( t *PwdBcrypt ) setSalt( newEncryptionSalt string ){
+	if len(newEncryptionSalt) > 0 {
 		t.Salt = newEncryptionSalt
 	}
 }

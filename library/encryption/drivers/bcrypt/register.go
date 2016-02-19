@@ -36,18 +36,21 @@ func Register() {
 	gdriver.Register(encryption.DRIVER_GROUP, &registerDriver{})
 }
 
+func SetDefault(){
+	gdriver.Default( encryption.DRIVER_GROUP, DRIVER_NAME )
+}
+
 func (r *registerDriver) New() interface{} {
 	return New()
 }
 
 func (r *registerDriver) Identity(id int) string {
 	switch id {
-	case gdriver.IDENT_NAME:
-		return STORAGE_IDENTITY
+
 	case gdriver.IDENT_SHORT:
 		return 	SHORT_HELP
 	case gdriver.IDENT_LONG:
 		return HELP_TEMPLATE
 	}
-	return gdriver.IDENT_UNKNOWN
+	return DRIVER_NAME
 }

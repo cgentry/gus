@@ -4,18 +4,37 @@ package main
 // database packages here, alter the constants that are used in the code and put any
 // system-wide configurations here.
 import (
-	/*  Database support. This is compiled in and available for selection.
-	    To remove the support (and overhead) you should comment it out. */
-	_ "github.com/cgentry/gus/library/storage/sqlite"
+	/*
+	 *  DATABASE SUPPORT:
+	 *		Include what you want to use here, then perform the registration below
+	 */
+	"github.com/cgentry/gus/library/storage/drivers/jsonfile"
+	"github.com/cgentry/gus/library/storage/drivers/mock"
+	"github.com/cgentry/gus/library/storage/drivers/sqlite"
 
-	/* Encryption support */
-	_ "github.com/cgentry/gus/library/encryption/drivers/bcrypt"
-	_ "github.com/cgentry/gus/library/encryption/drivers/sha512"
+	/*
+ 	*  ENCRYPTION SUPPORT:
+ 	*		Include what you want to use here, then perform the registration below
+ 	*/
+	"github.com/cgentry/gus/library/encryption/drivers/bcrypt"
+	"github.com/cgentry/gus/library/encryption/drivers/sha512"
 	/* REMOVE WHEN IN PRODUCTION */
-	_ "github.com/cgentry/gus/library/encryption/drivers/plaintext"
+	"github.com/cgentry/gus/library/encryption/drivers/plaintext"
 )
 
 const (
 	DEFAULT_CONFIG_FILENAME    = "/etc/gus/config.json"
 	DEFAULT_CONFIG_PERMISSIONS = 0600
 )
+
+func init(){
+	/* DATABASE SUPPORT */
+	jsonfile.Register()
+	mock.Register()
+	sqlite.Register()
+
+	/* ENCRYPTION SUPPORT */
+	bcrypt.Register()
+	sha512.Register()
+	plaintext.Register()
+}

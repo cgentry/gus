@@ -277,7 +277,7 @@ func (user *User) Logout() error {
 // ChangePassword to the new password. The user must be logged in for this
 func (user *User) ChangePassword(oldPassword, newPassword string) error {
 	if user.Authenticate(user.Token) == nil {
-		t := encryption.GetDriver()
+		t := encryption.GetDefaultDriver()
 		if t.EncryptPassword(oldPassword, user.Salt) == user.Password {
 			if err := CheckNewPassword(newPassword); err != nil {
 				return err
@@ -291,7 +291,7 @@ func (user *User) ChangePassword(oldPassword, newPassword string) error {
 }
 
 func (user *User) CheckPassword(testPassword string) error {
-	pwd := encryption.GetDriver().EncryptPassword(testPassword, user.Salt) // Encrypt password
+	pwd := encryption.GetDefaultDriver().EncryptPassword(testPassword, user.Salt) // Encrypt password
 
 	if pwd != user.Password {
 		return ErrInvalidPasswordOrUser
@@ -312,7 +312,7 @@ func (user *User) GenerateLostPassword() (newPassword string, err error) {
 
 func (user *User) ConfirmLostPassword(lostPwdToken string) (err error) {
 	if lostPwdToken == user.Token {
-		user.Password = encryption.GetDriver().EncryptPassword(lostPwdToken, user.Salt)
+		user.Password = encryption.GetDefaultDriver().EncryptPassword(lostPwdToken, user.Salt)
 	} else {
 		err = errors.New(`Invalid password or user id`)
 	}

@@ -33,7 +33,7 @@ type Store struct {
 	connection    Conn					// from Open(). this is the true DB connection
 }
 
-func NewStore( name string ) *Store {
+func NewStore( name string ) Storer {
 	return &Store{
 		name:          name,
 		isOpen:        false,
@@ -46,18 +46,41 @@ func NewStore( name string ) *Store {
 // Only one driver can be selected at a time. Calling GetDriver will
 // return the current driver
 // This will panic if no drivers have been registered
-func Select(name string) Storer {
+func SetDefault(name string) Storer {
 	gdriver.Default(DRIVER_GROUP,name)
-	return GetDriver()
+	return GetDriver(name)
 }
 
 // GetDriver will fetch the gdriver, call New and build up the storage driver
 // interface. Store defines all possible calls and acts as a simple gateway in order to
 // make any driver respond to any calls, even if it isn't implemented.
-func GetDriver() Storer {
-	rawDriver := gdriver.MustNewDefault( DRIVER_GROUP ).(gdriver.DriverInterface)
-	st := NewStore( rawDriver.Identity( gdriver.IDENT_NAME ) )
-	st.rawDriver = rawDriver
-	st.driver = rawDriver.New().(StorageDriver)
+func GetDefaultDriver() Storer {
+	name,_ := gdriver.GetDefaultName( DRIVER_GROUP )
+	return GetDriver( name )
+}
+
+func GetDriver( name string ) Storer {
+	st := NewStore( name )
+	st.SetStorageDriver( gdriver.MustNew( DRIVER_GROUP , name ).(StorageDriver ) )
+	drive, _ := gdriver.GetDriver( DRIVER_GROUP, name )
+	st.SetDriverInterface(drive )
 	return st
+}
+
+func Open( defaultDriverName, dsn, options string ) ( Storer , error ) {
+	storeObject := SetDefault( defaultDriverName )
+	return storeObject, storeObject.Open( dsn, options )
+}
+
+func ( s *Store ) SetDriverInterface( x gdriver.DriverInterface ){
+	s.rawDriver = x
+}
+func ( s *Store ) GetDriverInterface() gdriver.DriverInterface {
+	return s.rawDriver
+}
+func ( s * Store ) SetStorageDriver( x StorageDriver ) {
+	s.driver = x
+}
+func ( s *Store ) GetStorageDriver( ) StorageDriver {
+	return s.driver
 }

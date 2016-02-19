@@ -1,7 +1,7 @@
 package tenant
 
 import (
-	_ "github.com/cgentry/gus/library/encryption/drivers/plaintext"
+	"github.com/cgentry/gus/library/encryption/drivers/plaintext"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 	//"fmt"
@@ -17,6 +17,8 @@ func TestNewUser(t *testing.T) {
 }
 
 func TestAuthenticate(t *testing.T) {
+	plaintext.Register()
+	plaintext.SetDefault()
 	pwd := "TestingPassvord"
 	tuser := NewUser()
 	tuser.SetDomain("dom")

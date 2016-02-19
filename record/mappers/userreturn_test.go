@@ -2,7 +2,7 @@ package mappers
 
 import (
 	"github.com/cgentry/gus/library/encryption"
-	_ "github.com/cgentry/gus/library/encryption/drivers/plaintext"
+	"github.com/cgentry/gus/library/encryption/drivers/plaintext"
 	"github.com/cgentry/gus/record/response"
 	"github.com/cgentry/gus/record/tenant"
 	. "github.com/smartystreets/goconvey/convey"
@@ -11,7 +11,10 @@ import (
 )
 
 func TestUserReturn(t *testing.T) {
-	encryption.Select("plaintext")
+	t.Log("Begin TestUserReturn")
+	plaintext.Register()
+
+	encryption.SetDefault("plaintext")
 	user := tenant.NewTestUser()
 	user.GenerateGuid()
 	user.Token = user.CreateToken()

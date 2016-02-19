@@ -47,7 +47,7 @@ func (t *PwdPlaintext) Setup(json string) encryption.EncryptDriver {
 }
 
 func ( t *PwdPlaintext ) setSalt( newEncryptionSalt string ){
-	if len(opt.Salt) > 0 {
+	if len(newEncryptionSalt) > 0 {
 		t.Salt = newEncryptionSalt
 	}
 }

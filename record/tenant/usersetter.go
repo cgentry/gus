@@ -83,7 +83,7 @@ func (user *User) SetPassword(newPassword string) error {
 	if len(newPassword) < 6 {
 		return ecode.ErrPasswordTooShort
 	}
-	user.Password = encryption.GetDriver().EncryptPassword(newPassword, user.Salt)
+	user.Password = encryption.GetDefaultDriver().EncryptPassword(newPassword, user.Salt)
 	return nil
 }
 

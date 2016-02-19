@@ -80,3 +80,4 @@ func (t *SqliteConn) Close() error {
 	}
 	return NewGeneralFromError(err, http.StatusInternalServerError)
 }
+

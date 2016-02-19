@@ -9,7 +9,7 @@ import (
 	"github.com/cgentry/gus/record/tenant"
 	"github.com/cgentry/gus/service"
 	"github.com/cgentry/gus/library/storage"
-	_ "github.com/cgentry/gus/library/storage/mock"
+	"github.com/cgentry/gus/library/storage/drivers/mock"
 	. "github.com/smartystreets/goconvey/convey"
 	"io/ioutil"
 	"net/http"
@@ -20,6 +20,8 @@ import (
 func TestParseParms(t *testing.T) {
 	c := configure.New()
 	c.Default()
+	mock.Register()
+	mock.SetDefault()
 
 	Convey("Parse Parms", t, func() {
 

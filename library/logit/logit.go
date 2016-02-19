@@ -5,7 +5,7 @@
 package logit
 
 import (
-//"strings"
+	"github.com/cgentry/gdriver"
 )
 
 const (
@@ -23,12 +23,17 @@ type LogitDriver interface {
 }
 
 
-func Select( name string ) LogitDriver {
+func SetDefault( name string ) LogitDriver {
 	gdriver.Default( DRIVER_GROUP , name )
-	return GetDriver()
+	return GetDriver( name )
 }
 
 // This will panic if no drivers have been registered
-func GetDriver() LogitDriver {
+func GetDefaultDriver() LogitDriver {
 	return gdriver.MustNewDefault(DRIVER_GROUP).(LogitDriver)
+}
+
+// This will panic if no drivers have been registered
+func GetDriver(name string ) LogitDriver {
+	return gdriver.MustNew(DRIVER_GROUP, name ).(LogitDriver)
 }

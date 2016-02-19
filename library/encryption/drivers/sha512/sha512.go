@@ -71,13 +71,13 @@ func (t *PwdSha512) Setup(jsonOption string) encryption.EncryptDriver {
 }
 
 func ( t *PwdSha512 )setCost( newCostValue int ){
-	if opt.Cost > 0 {
+	if newCostValue > 0 {
 		t.Cost = newCostValue
 	}
 }
 
 func ( t *PwdSha512 ) setSalt( newEncryptionSalt string ){
-	if len(opt.Salt) > 0 {
+	if len(newEncryptionSalt) > 0 {
 		t.Salt = newEncryptionSalt
 	}
 }

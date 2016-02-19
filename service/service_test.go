@@ -3,13 +3,13 @@ package service
 import (
 	"encoding/json"
 	"github.com/cgentry/gus/ecode"
-	_ "github.com/cgentry/gus/library/encryption/drivers/plaintext"
+	"github.com/cgentry/gus/library/encryption/drivers/plaintext"
 	"github.com/cgentry/gus/record/head"
 	"github.com/cgentry/gus/record/request"
 	"github.com/cgentry/gus/record/response"
 	"github.com/cgentry/gus/record/tenant"
 	"github.com/cgentry/gus/library/storage"
-	_ "github.com/cgentry/gus/library/storage/sqlite"
+	"github.com/cgentry/gus/library/storage/drivers/sqlite"
 	. "github.com/smartystreets/goconvey/convey"
 	"os"
 	"testing"
@@ -30,9 +30,12 @@ func destroyStore() {
 }
 
 func TestServiceRegister(t *testing.T) {
+	sqlite.Register()
+	plaintext.Register()
+	plaintext.SetDefault()
 	sr := NewServiceRegister()
 
-	store, err := storage.Open("sqlite", t_service_test_db, "")
+	store, err := storage.Open( sqlite.DRIVER_NAME, t_service_test_db, "")
 	if err != nil {
 		t.Errorf("Error opening store: %s", err.Error())
 	}
