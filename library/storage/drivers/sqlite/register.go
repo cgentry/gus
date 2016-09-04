@@ -6,10 +6,11 @@ import (
 )
 
 const (
-	DRIVER_NAME      = "sqlite"
-	STORAGE_IDENTITY = "Sqlite"
-	SHORT_HELP       = "Simple SQLite3 driver. Only suitable for testing purposes."
-	HELP_TEMPLATE    = `
+	// DriverName Specifies the specific identity of this driver within a group
+	DriverName      = "sqlite"
+	IdentityStorage = "Sqlite"
+	HelpShort       = "Simple SQLite3 driver. Only suitable for testing purposes."
+	HelpTemplate    = `
 
    This is a lightweight driver meant for testing and debugging systems.
    It provides a full database testing system and stores the data in a
@@ -28,11 +29,11 @@ type registerDriver struct{}
 
 // Register is a simple wrapper to make sure registration occurs properly
 func Register() {
-	gdriver.Register(storage.DRIVER_GROUP, &registerDriver{})
+	gdriver.Register(storage.DriverGroup, &registerDriver{})
 }
 
 func SetDefault() {
-	gdriver.Default(storage.DRIVER_GROUP,DRIVER_NAME)
+	gdriver.Default(storage.DriverGroup,DriverName)
 }
 
 // New() will return the resutls of the Sqlite New() function. You must cast
@@ -44,10 +45,10 @@ func (r *registerDriver) New() interface{} {
 // Identity provides a simple identifying string to the caller.
 func (r *registerDriver) Identity(id int) string {
 	switch id {
-	case gdriver.IDENT_SHORT:
-		return SHORT_HELP
-	case gdriver.IDENT_LONG:
-		return HELP_TEMPLATE
+	case gdriver.IdentityShort:
+		return HelpShort
+	case gdriver.IdentityLong:
+		return HelpTemplate
 	}
-	return STORAGE_IDENTITY
+	return IdentityStorage
 }

@@ -108,10 +108,10 @@ func UserField(user *tenant.User, key, value string) (found bool, rtn error) {
 	return
 }
 
-/**
- * Create a record from the user record passed to this routine
- * See:		UserReturn
- */
+
+ // UserFromCli copy fields from the user cli record to the rtn record. We return the same record
+ // passed, so you can safely ignore the return
+ // See:		UserReturn
 func UserFromCli(rtn *tenant.User, r *tenant.UserCli) (ortn *tenant.User, err error) {
 	var eUpdate ErrSetter
 	ortn = rtn

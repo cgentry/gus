@@ -6,10 +6,11 @@ import (
 )
 
 const (
-	DRIVER_NAME = "bcrypt"
-	STORAGE_IDENTITY	= "BCrypt"
-	SHORT_HELP			= "Standard high-quality encryption using BCRYPT methods"
-	HELP_TEMPLATE		= `
+	// DriverName Specifies the specific identity of this driver within a group
+	DriverName      = "bcrypt"
+	IdentityStorage = "BCrypt"
+	HelpShort       = "Standard high-quality encryption using BCRYPT methods"
+	HelpTemplate    = `
   The bcrypt function is the default password hash algorithm for BSD and many other systems.
   Besides incorporating a salt to protect against rainbow table attacks, bcrypt is an adaptive
   function: over time, the iteration count can be increased to make it slower, so it remains
@@ -33,11 +34,11 @@ type registerDriver struct{}
 
 // Register is a simple wrapper to make sure registration occurs properly
 func Register() {
-	gdriver.Register(encryption.DRIVER_GROUP, &registerDriver{})
+	gdriver.Register(encryption.DriverGroup, &registerDriver{})
 }
 
-func SetDefault(){
-	gdriver.Default( encryption.DRIVER_GROUP, DRIVER_NAME )
+func SetDefault() {
+	gdriver.Default(encryption.DriverGroup, DriverName)
 }
 
 func (r *registerDriver) New() interface{} {
@@ -47,10 +48,10 @@ func (r *registerDriver) New() interface{} {
 func (r *registerDriver) Identity(id int) string {
 	switch id {
 
-	case gdriver.IDENT_SHORT:
-		return 	SHORT_HELP
-	case gdriver.IDENT_LONG:
-		return HELP_TEMPLATE
+	case gdriver.IdentityShort:
+		return HelpShort
+	case gdriver.IdentityLong:
+		return HelpTemplate
 	}
-	return DRIVER_NAME
+	return DriverName
 }

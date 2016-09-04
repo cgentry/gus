@@ -13,21 +13,23 @@ import (
 	"github.com/cgentry/gus/library/storage/drivers/sqlite"
 
 	/*
- 	*  ENCRYPTION SUPPORT:
- 	*		Include what you want to use here, then perform the registration below
- 	*/
+	*  ENCRYPTION SUPPORT:
+	*		Include what you want to use here, then perform the registration below
+	 */
 	"github.com/cgentry/gus/library/encryption/drivers/bcrypt"
 	"github.com/cgentry/gus/library/encryption/drivers/sha512"
 	/* REMOVE WHEN IN PRODUCTION */
 	"github.com/cgentry/gus/library/encryption/drivers/plaintext"
 )
 
+// DefaultConfigFilename is where you will find the configuration file for GUS
+// DefaultConfigPermissions is the octal UNIX permissions for the config file
 const (
-	DEFAULT_CONFIG_FILENAME    = "/etc/gus/config.json"
-	DEFAULT_CONFIG_PERMISSIONS = 0600
+	DefaultConfigFilename    = "/etc/gus/config.json"
+	DefaultConfigPermissions = 0600
 )
 
-func init(){
+func init() {
 	/* DATABASE SUPPORT */
 	jsonfile.Register()
 	mock.Register()

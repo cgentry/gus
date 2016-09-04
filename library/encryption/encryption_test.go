@@ -15,11 +15,11 @@ type tDriver1 struct{}
 func (t *tDriver1) New() interface{} { return &mockCrypt{} }
 func (t *tDriver1) Identity(id int) string {
 	switch id {
-	case gdriver.IDENT_NAME:
+	case gdriver.IdentityName:
 		return "name"
-	case gdriver.IDENT_SHORT:
+	case gdriver.IdentityShort:
 		return "short"
-	case gdriver. IDENT_LONG:
+	case gdriver. IdentityLong:
 		return "long"
 	}
 	return "unknown"
@@ -36,19 +36,19 @@ func (m *mockCrypt) Setup( a string ) EncryptDriver {
 	return m
 }
 func (t *mockCrypt) Id() string {
-	return gdriver.Help(DRIVER_GROUP, "name", gdriver.IDENT_NAME)
+	return gdriver.Help(DriverGroup, "name", gdriver.IdentityName)
 }
 func (t *mockCrypt) ShortHelp() string {
-	return gdriver.Help(DRIVER_GROUP, "name", gdriver.IDENT_SHORT)
+	return gdriver.Help(DriverGroup, "name", gdriver.IdentityShort)
 }
 func (t *mockCrypt) LongHelp() string {
-	return gdriver.Help(DRIVER_GROUP, "name", gdriver.IDENT_LONG)
+	return gdriver.Help(DriverGroup, "name", gdriver.IdentityLong)
 }
 
 
 func TestRegister(t *testing.T) {
 
-	gdriver.Register( DRIVER_GROUP, &tDriver1{})
+	gdriver.Register( DriverGroup, &tDriver1{})
 
 	drv := SetDefault( "name")
 	if "name" != drv.Id() {

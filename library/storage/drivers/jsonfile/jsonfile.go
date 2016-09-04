@@ -145,15 +145,15 @@ func (t *JsonFileConn) UserFetch(domain, key, value string) (*tenant.User, error
 
 	for _, userRecord := range t.userlist {
 
-		if domain == storage.MATCH_ANY_DOMAIN || domain == userRecord.Domain {
+		if domain == storage.MatchAnyDomain || domain == userRecord.Domain {
 			switch key {
-			case storage.FIELD_GUID:
+			case storage.FieldGUID:
 				found = (value == userRecord.Guid)
-			case storage.FIELD_EMAIL:
+			case storage.FieldEmail:
 				found = (value == userRecord.Email)
-			case storage.FIELD_LOGIN:
+			case storage.FieldLogin:
 				found = (value == userRecord.LoginName)
-			case storage.FIELD_TOKEN:
+			case storage.FieldToken:
 				found = (value == userRecord.Token)
 			}
 			if found {

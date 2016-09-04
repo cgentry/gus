@@ -26,7 +26,7 @@ func TestSimpleRegisterCycle(t *testing.T) {
 	//var compareTime1, compareTime2 time.Time
 	clearSqliteTest()
 	/*
-		dbConn, err := storage.Open(STORAGE_IDENTITY, STORE_LOCAL)
+		dbConn, err := storage.Open(IdentityStorage, STORE_LOCAL)
 		defer clearSqliteTest()
 		defer dbConn.Close()
 		dbConn.CreateStore()
@@ -53,28 +53,28 @@ func TestSimpleRegisterCycle(t *testing.T) {
 		So(serr, ShouldBeNil)
 
 		// FETCH BY EMAIL
-		user2, err := dbConn.UserFetch(storage.MATCH_ANY_DOMAIN, storage.FIELD_GUID, user.Guid)
+		user2, err := dbConn.UserFetch(storage.MatchAnyDomain, storage.FieldGUID, user.Guid)
 		So(err, ShouldBeNil)
 		So(user2.Domain, ShouldEqual, user.Domain)
 		So(user2.Token, ShouldEqual, user.Token)
 		So(user2.FullName, ShouldEqual, user.FullName)
 
 		// Fetch by TOKEN
-		user3, err := dbConn.UserFetch(storage.MATCH_ANY_DOMAIN, storage.FIELD_TOKEN, user.Token)
+		user3, err := dbConn.UserFetch(storage.MatchAnyDomain, storage.FieldToken, user.Token)
 		So(err, ShouldBeNil)
 		So(user3.Domain, ShouldEqual, user.Domain)
 		So(user3.Token, ShouldEqual, user.Token)
 		So(user3.FullName, ShouldEqual, user.FullName)
 
 		// FETCH BY EMAIL
-		user4, err := dbConn.UserFetch(user.Domain, storage.FIELD_EMAIL, user.Email)
+		user4, err := dbConn.UserFetch(user.Domain, storage.FieldEmail, user.Email)
 		So(err, ShouldBeNil)
 		So(user4.Domain, ShouldEqual, user.Domain)
 		So(user4.Token, ShouldEqual, user.Token)
 		So(user4.FullName, ShouldEqual, user.FullName)
 
 		// FETCH BY Login name
-		user5, err := dbConn.UserFetch(user.Domain, storage.FIELD_LOGIN, user.LoginName)
+		user5, err := dbConn.UserFetch(user.Domain, storage.FieldLogin, user.LoginName)
 		So(err, ShouldBeNil)
 		So(user5.Domain, ShouldEqual, user.Domain)
 		So(user5.Token, ShouldEqual, user.Token)
@@ -85,7 +85,7 @@ func TestSimpleRegisterCycle(t *testing.T) {
 			compareTime2= user.UpdatedAt
 			err = dbConn.UserLogin(user)
 			So(err, ShouldBeNil )
-			user, err = dbConn.FetchUserByGuid(user.Guid)
+			user, err = dbConn.FetchUserByGUID(user.Guid)
 			So( user.IsLoggedIn, ShouldBeTrue)
 			So(user.LoginAt.Equal(compareTime1), ShouldBeFalse)
 			So(user.UpdatedAt.Equal(compareTime2), ShouldBeFalse)

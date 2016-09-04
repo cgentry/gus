@@ -13,7 +13,7 @@ import (
 )
 
 func (t *SqliteConn) UserFetch(domain, field, val string) (*tenant.User, error) {
-	if domain == storage.MATCH_ANY_DOMAIN {
+	if domain == storage.MatchAnyDomain {
 		return t.fetchUserByFieldAny(field, val)
 	}
 	return t.fetchUserByField(domain, field, val)

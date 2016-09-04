@@ -17,7 +17,7 @@ import (
 	"strings"
 )
 
-const DRIVER_GROUP = "encryption"
+const DriverGroup = "encryption"
 
 // The interface gives the set of methods that an encryption driver must implement.
 type EncryptDriver interface {
@@ -53,18 +53,18 @@ func UnmarshalOptions(jsonOption string) (opt *CryptOptions, err error) {
 // Pick a registered driver for use in the system. Only one driver can be selected at a time.
 // This will panic if no drivers have been registered
 func SetDefault(name string) EncryptDriver {
-	gdriver.Default(DRIVER_GROUP,name)
-	return gdriver.MustNew(DRIVER_GROUP, name).(EncryptDriver)
+	gdriver.Default(DriverGroup,name)
+	return gdriver.MustNew(DriverGroup, name).(EncryptDriver)
 }
 
 
 // This will panic if no drivers have been registered
 func GetDefaultDriver() EncryptDriver {
-	return gdriver.MustNewDefault(DRIVER_GROUP).(EncryptDriver)
+	return gdriver.MustNewDefault(DriverGroup).(EncryptDriver)
 }
 
 func GetDriver( name string ) EncryptDriver {
-	return gdriver.MustNew( DRIVER_GROUP, name ).(EncryptDriver)
+	return gdriver.MustNew( DriverGroup, name ).(EncryptDriver)
 }
 
 func GetStaticSalt(offset int) string {

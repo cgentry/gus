@@ -1,20 +1,23 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
+
 	"github.com/cgentry/gus/cli"
 	"github.com/cgentry/gus/library/encryption"
+	"github.com/cgentry/gus/library/storage"
 	"github.com/cgentry/gus/record/configure"
 	"github.com/cgentry/gus/record/mappers"
 	"github.com/cgentry/gus/record/tenant"
-	"github.com/cgentry/gus/library/storage"
-	"io/ioutil"
-	"os"
 )
 
+// DefaultCmdUserLevel defines what type of default command should be run
 const (
-	DEFAULT_CMD_USER_LEVEL = "user"
+	DefaultCmdUserLevel = "user"
 )
 
 var cmdUser = &cli.Command{
@@ -68,7 +71,7 @@ func init() {
 	cmdUser.Run = runUser
 	addCommonCommandFlags(cmdUser)
 
-	cmdUser.Flag.StringVar(&cmdUserCli.Level, "priv", DEFAULT_CONFIG_FILENAME, "")
+	cmdUser.Flag.StringVar(&cmdUserCli.Level, "priv", DefaultConfigFilename, "")
 	cmdUser.Flag.StringVar(&cmdUserCli.LoginName, "login", "", "")
 	cmdUser.Flag.StringVar(&cmdUserCli.Email, "email", "", "")
 	cmdUser.Flag.StringVar(&cmdUserCli.Domain, "group", "", "")
@@ -116,9 +119,8 @@ func runUser(cmd *cli.Command, args []string) {
 	}
 }
 
-// Add a single user to the system. This can be either a client or a normal user
+// runUserAdd will add a single user to the system. This can be either a client or a normal user
 // User is prompted for all options
-//
 func runUserAdd(cmd *cli.Command, args []string) {
 	var promptForValues bool
 	var configStore configure.Store
@@ -127,11 +129,11 @@ func runUserAdd(cmd *cli.Command, args []string) {
 	if err != nil {
 		runtimeFail("Opening configuration file", err)
 	}
-	encryption.Select(c.Encrypt.Name).Setup(c.Encrypt.Options)
+	encryption.GetDriver(c.Encrypt.Name).Setup(c.Encrypt.Options)
 
 	// We've got the config file. Now we need to prompt for the user information
 	for promptForValues = true; promptForValues; {
-		cli.PromptForStructFields(cmdUserCli, template_cmd_help_useradd)
+		cli.PromptForStructFields(cmdUserCli, templateCmdUseradd)
 		fmt.Println("\nValues are:")
 		cli.PrintStructValue(os.Stdout, cmdUserCli)
 		promptForValues = cli.PromptYesNoDefault(os.Stdout, os.Stdin, "Re-enter values", false)
@@ -191,10 +193,11 @@ func runUserShow(cmd *cli.Command, args []string) {
 		runtimeFail("Opening database", err)
 	}
 	userRecord := getUserRecordByCli(store, cmdUserCli)
-	cli.RenderTemplate(os.Stdout, template_cmd_usershow, userRecord)
+	cli.RenderTemplate(os.Stdout, templateCmdUsershow, userRecord)
 }
 
 // runUserLoad will load up the current store from a JSON list
+// Passed is the command and the arguments
 func runUserLoad(cmd *cli.Command, args []string) {
 
 	c, err := GetConfigFile()
@@ -206,16 +209,16 @@ func runUserLoad(cmd *cli.Command, args []string) {
 		runtimeFail("No load file passed", nil)
 	}
 	loadFile := args[0]
-	err = LoadUsersFromJson(cmd, loadFile)
+	err = LoadUsersFromJSON(c, loadFile)
 	if err != nil {
 		runtimeFail("Loading user data from "+loadFile, err)
 	}
 }
 
-// LoadUsersFromJson will load up the store, either clients or users, from
-// the JSON file.
-func LoadUsersFromJson(c *configure.Configure, loadFile string) (err error) {
-	var fdata string
+// LoadUsersFromJSON will load up the configuration store, either clients or users, from
+// a JSON file.
+func LoadUsersFromJSON(c *configure.Configure, loadFile string) (err error) {
+	var fdata []byte
 	var users *[]tenant.UserCli
 	var oneUser tenant.User
 
@@ -228,27 +231,28 @@ func LoadUsersFromJson(c *configure.Configure, loadFile string) (err error) {
 		err = json.Unmarshal(fdata, users)
 		if err != nil {
 			runtimeFail("Reading JSON file ", err)
-			clientStore, err := storage.Open(c.Client.Name, c.Client.Dsn, c.Client.Options)
+			var clientStore storage.Storer
+			clientStore, err = storage.Open(c.Client.Name, c.Client.Dsn, c.Client.Options)
 			if err != nil {
 				return err
 			}
 			defer clientStore.Close()
-
-			userStore, err := storage.Open(c.User.Name, c.User.Dsn, c.User.Options)
+			var userStore storage.Storer
+			userStore, err = storage.Open(c.User.Name, c.User.Dsn, c.User.Options)
 			if err != nil {
 				return err
 			}
 			defer userStore.Close()
 
-			for oneUserCli := range users {
-				err = mappers.UserFromCli(oneUser, oneUserCli)
+			for _, oneUserCli := range *users {
+				_, err = mappers.UserFromCli(&oneUser, &oneUserCli)
 				if err != nil {
 					return
 				}
 				if oneUser.IsSystem {
-					err = clientStore.Insert(oneUser)
+					err = clientStore.UserInsert(&oneUser)
 				} else {
-					err = userStore.Insert(oneUser)
+					err = userStore.UserInsert(&oneUser)
 				}
 				if err != nil {
 					return
@@ -259,7 +263,7 @@ func LoadUsersFromJson(c *configure.Configure, loadFile string) (err error) {
 	return
 }
 
-// Set the user's enable flag to either enable or disable. Don;t
+// setUserEnableFlag sets the user's enable flag to either enable or disable. Don;t
 // change anything if there is no change to be made.
 func setUserEnableFlag(newFlag bool) {
 	var configStore configure.Store
@@ -293,7 +297,7 @@ func setUserEnableFlag(newFlag bool) {
 }
 
 // Find a user record either by email or login. If no error, print the message and exit.
-func getUserRecordByCli(store *storage.Store, rec *tenant.UserCli) (userRec *tenant.User) {
+func getUserRecordByCli(store storage.Storer, rec *tenant.UserCli) (userRec *tenant.User) {
 	var err error
 	if rec.Email != "" {
 		userRec, err = store.FetchUserByEmail(rec.Domain, rec.Email)
@@ -307,7 +311,7 @@ func getUserRecordByCli(store *storage.Store, rec *tenant.UserCli) (userRec *ten
 	return
 }
 
-const template_cmd_help_useradd = `
+const templateCmdUseradd = `
 =================================
    Add New User
 =================================
@@ -317,7 +321,7 @@ to add, then you will be prompted for each of the fields.{{ range . }}
         {{ .Help}}{{ end }}
 
 `
-const template_cmd_usershow = `
+const templateCmdUsershow = `
 ==============================================
 User Record for: {{ .FullName }}
 ==============================================

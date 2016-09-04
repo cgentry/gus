@@ -147,7 +147,7 @@ func httpErrorWrite(w http.ResponseWriter, code int, msg string) {
 	responsePackage := record.NewPackage()
 	err := ecode.NewGeneralError(msg, code)
 	responsePackage.SetBodyMarshal(err)
-	responsePackage.SetBodyType(record.PACKAGE_BODYTYPE_ERROR)
+	responsePackage.SetBodyType(record.PackageBodytypeError)
 	httpResponseWrite(w, responsePackage, err)
 }
 

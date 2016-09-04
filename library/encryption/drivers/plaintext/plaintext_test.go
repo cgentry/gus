@@ -9,8 +9,8 @@ import (
 
 func TestSetup(t *testing.T ){
 	Register()
-	if ! gdriver.IsRegistered( encryption.DRIVER_GROUP, DRIVER_NAME ) {
-		t.Errorf("%s is not registered", DRIVER_NAME)
+	if ! gdriver.IsRegistered( encryption.DriverGroup, DriverName ) {
+		t.Errorf("%s is not registered", DriverName)
 	}
 }
 func TestGenerate(t *testing.T) {
@@ -56,8 +56,8 @@ func TestSimilarUserDifferntPwd(t *testing.T) {
 func TestAfterChangingSalt(t *testing.T) {
 	user := tenant.NewTestUser()
 	drv := encryption.GetDefaultDriver()
-	if drv.Id( ) != DRIVER_NAME {
-		t.Errorf("Driver identity is wrong: %s != %s", DRIVER_NAME, drv.Id())
+	if drv.Id( ) != DriverName {
+		t.Errorf("Driver identity is wrong: %s != %s", DriverName, drv.Id())
 	}
 	pwd := drv.EncryptPassword("123456", user.Salt)
 	drv.Setup(`{ "Salt": "hello - this should screw up password" }`)

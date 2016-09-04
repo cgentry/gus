@@ -12,10 +12,11 @@
 package bcrypt
 
 import (
+	"log"
+
 	"code.google.com/p/go.crypto/bcrypt"
 	"github.com/cgentry/gdriver"
 	"github.com/cgentry/gus/library/encryption"
-	"log"
 )
 
 type PwdBcrypt struct {
@@ -23,14 +24,19 @@ type PwdBcrypt struct {
 	Cost int
 }
 
+// Id returns the string identifier for this driver
 func (t *PwdBcrypt) Id() string {
-	return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_NAME)
+	return gdriver.Help(encryption.DriverGroup, DriverName, gdriver.IdentityName)
 }
+
+// ShortHelp returns a short string identifier for the identity.
 func (t *PwdBcrypt) ShortHelp() string {
-	return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_SHORT)
+	return gdriver.Help(encryption.DriverGroup, DriverName, gdriver.IdentityShort)
 }
+
+// LongHelp returns a longer descriptive text for the help
 func (t *PwdBcrypt) LongHelp() string {
-	return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_LONG)
+	return gdriver.Help(encryption.DriverGroup, DriverName, gdriver.IdentityLong)
 }
 
 // New will create a BCRYPT strucutre. The salt is given a static string but
@@ -61,24 +67,23 @@ func (t *PwdBcrypt) Setup(jsonOptions string) encryption.EncryptDriver {
 			log.Printf("Bcrypt: Could not unmarshal '%s' options: ignored.", jsonOptions)
 			return t
 		}
-		t.setCost( opt.Cost )
-		t.setSalt( opt.Salt )
+		t.setCost(opt.Cost)
+		t.setSalt(opt.Salt)
 	}
 	return t
 }
 
-func ( t *PwdBcrypt )setCost( newCostValue int ){
+func (t *PwdBcrypt) setCost(newCostValue int) {
 	if newCostValue > 0 {
 		t.Cost = newCostValue
 	}
 }
 
-func ( t *PwdBcrypt ) setSalt( newEncryptionSalt string ){
+func (t *PwdBcrypt) setSalt(newEncryptionSalt string) {
 	if len(newEncryptionSalt) > 0 {
 		t.Salt = newEncryptionSalt
 	}
 }
-
 
 // ComparePasswords must be called with a bcrypt password.
 func (t *PwdBcrypt) ComparePasswords(hashedPassword, clearPassword, userSalt string) bool {
@@ -86,4 +91,3 @@ func (t *PwdBcrypt) ComparePasswords(hashedPassword, clearPassword, userSalt str
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), saltyPassword)
 	return err == nil
 }
-

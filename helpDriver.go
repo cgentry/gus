@@ -1,11 +1,14 @@
+// helpDriver will handle all of the output of help to the user.
 package main
 
 import (
 	"fmt"
+	"os"
+
+	"github.com/cgentry/gdriver"
 	"github.com/cgentry/gus/cli"
 	"github.com/cgentry/gus/library/encryption"
 	"github.com/cgentry/gus/library/storage"
-	"os"
 )
 
 var helpStore = &cli.Command{
@@ -40,15 +43,15 @@ func init() {
 
 // Output any help that is required
 func runStore(cmd *cli.Command, args []string) {
-	listStore := storage.GetMap()
+	listStore := gdriver.ListMembers(storage.DriverGroup)
 
 	if len(args) == 0 {
-		cli.RenderTemplate(os.Stdout, template_storage_list, listStore)
+		cli.RenderTemplate(os.Stdout, templateStorageList, listStore)
 		return
 	}
 	if len(args) == 1 {
 		if entry, ok := listStore[args[0]]; ok {
-			cli.RenderTemplate(os.Stdout, template_storage_entry, entry)
+			cli.RenderTemplate(os.Stdout, templateStorageEntry, entry)
 			return
 		}
 		fmt.Fprintf(os.Stderr, "'%s' is not a valid storage driver\n", args[0])
@@ -59,26 +62,26 @@ func runStore(cmd *cli.Command, args []string) {
 	return
 }
 
-const template_storage_list = `
+const templateStorageList = `
 List of storage drivers available:{{ range . }}
-  {{ .Id }}: {{ .ShortHelp }}{{ end }}
+  {{ .Identity(gdriver.IdentityName) }}: {{ .Identity( gdriver.IdentityShort) }}{{ end }}
 
 `
-const template_storage_entry = `
-{{ .Id }}: {{ .ShortHelp }}
-{{ .LongHelp }}
+const templateStorageEntry = `
+{{ .Identity(gdriver.IdentityName) }}: {{ .Identity(gdriver.IdentityShort) }}
+{{ .Identity(gdriver.IdentityLong) }}
 `
 
 func runEncrypt(cmd *cli.Command, args []string) {
-	listStore := encryption.GetMap()
+	listStore := gdriver.ListMembers(encryption.DriverGroup)
 
 	if len(args) == 0 {
-		cli.RenderTemplate(os.Stdout, template_encryption_list, listStore)
+		cli.RenderTemplate(os.Stdout, templateEncryptionList, listStore)
 		return
 	}
 	if len(args) == 1 {
 		if entry, ok := listStore[args[0]]; ok {
-			cli.RenderTemplate(os.Stdout, template_encryption_entry, entry)
+			cli.RenderTemplate(os.Stdout, templateEncryptionEntry, entry)
 			return
 		}
 		fmt.Fprintf(os.Stderr, "'%s' is not a valid encryption driver\n", args[0])
@@ -89,12 +92,12 @@ func runEncrypt(cmd *cli.Command, args []string) {
 	return
 }
 
-const template_encryption_list = `
+const templateEncryptionList = `
 List of encryption drivers available:{{ range . }}
   {{ .Id }}: {{ .ShortHelp }}{{ end }}
 
 `
-const template_encryption_entry = `
+const templateEncryptionEntry = `
 {{ .Id }}: {{ .ShortHelp }}
 {{ .LongHelp }}
 `

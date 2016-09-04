@@ -6,10 +6,11 @@ import (
 )
 
 const (
-	DRIVER_NAME      = "mock"
-	STORAGE_IDENTITY = "Mock"
-	SHORT_HELP       = "Simple JSON File. Store data JSON encoded into a file"
-	HELP_TEMPLATE    = `
+	// DriverName Specifies the specific identity of this driver within a group
+	DriverName      = "mock"
+	IdentityStorage = "Mock"
+	HelpShort       = "Simple JSON File. Store data JSON encoded into a file"
+	HelpTemplate    = `
 
    This is a dummy driver used for testing purposes.
 
@@ -20,7 +21,7 @@ type registerDriver struct{}
 
 // Register is a simple wrapper to make sure registration occurs properly
 func Register() {
-	gdriver.Register(storage.DRIVER_GROUP, &registerDriver{})
+	gdriver.Register(storage.DriverGroup, &registerDriver{})
 }
 
 // New() will return the resutls of the jsonfile New() function. You must cast
@@ -32,11 +33,11 @@ func (r *registerDriver) New() interface{} {
 // Identity provides a simple identifying string to the caller.
 func (r *registerDriver) Identity(id int) string {
 	switch id {
-	case gdriver.IDENT_SHORT:
-		return SHORT_HELP
+	case gdriver.IdentityShort:
+		return HelpShort
 
-	case gdriver.IDENT_LONG:
-		return HELP_TEMPLATE
+	case gdriver.IdentityLong:
+		return HelpTemplate
 	}
-	return STORAGE_IDENTITY
+	return IdentityStorage
 }

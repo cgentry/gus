@@ -59,15 +59,15 @@ func (t *MockConn) UserFetch(domain, key, value string) (*tenant.User, error) {
 	found := false
 	for _, user := range t.db {
 
-		if domain == storage.MATCH_ANY_DOMAIN || domain == user.Domain {
+		if domain == storage.MatchAnyDomain || domain == user.Domain {
 			switch key {
-			case storage.FIELD_GUID:
+			case storage.FieldGUID:
 				found = (value == user.Guid)
-			case storage.FIELD_EMAIL:
+			case storage.FieldEmail:
 				found = (value == user.Email)
-			case storage.FIELD_LOGIN:
+			case storage.FieldLogin:
 				found = (value == user.LoginName)
-			case storage.FIELD_TOKEN:
+			case storage.FieldToken:
 				found = (value == user.Token)
 			}
 			if found {

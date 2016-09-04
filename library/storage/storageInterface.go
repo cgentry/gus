@@ -1,25 +1,21 @@
 package storage
 
 import (
-	"github.com/cgentry/gus/record/tenant"
 	"github.com/cgentry/gdriver"
+	"github.com/cgentry/gus/record/tenant"
 )
 
-// The StorageDriver interface defines very general, high level operations for retrieval and storage of
+// StorageDriver interface defines very general, high level operations for retrieval and storage of
 // data. The back-storage can be a flat file, database or document store.
 // The interfaces specify NO sql methods and flatten out operations
 type StorageDriver interface {
 	Open(connect string, extraDriverOptions string) (Conn, error)
-
 }
 
-
-// The interface gives the set of methods that a storage driver MAY implement.
+// Storer interface gives the set of methods that a storage driver MAY implement.
 // Because some are optional, see the methods for Store for ones that
 // are required.
-
 type Storer interface {
-
 	// Required wrappers for required StorageDriver functions
 	Open(connect string, extraDriverOptions string) error
 	UserFetch(domain, lookupKey, lookkupValue string) (*tenant.User, error)
@@ -36,10 +32,9 @@ type Storer interface {
 	Release() error
 	Reset()
 
-
 	// The following are convienence wrapper functions for the UserXXX functions
 	FetchUserByEmail(domain, email string) (*tenant.User, error)
-	FetchUserByGuid(guid string) (*tenant.User, error)
+	FetchUserByGUID(guid string) (*tenant.User, error)
 	FetchUserByLogin(domain, loginName string) (*tenant.User, error)
 	FetchUserByToken(token string) (*tenant.User, error)
 
@@ -49,15 +44,14 @@ type Storer interface {
 	LongHelp() string
 
 	// Internal routines
-	SetDriverInterface( x gdriver.DriverInterface  )
+	SetDriverInterface(x gdriver.DriverInterface)
 	GetDriverInterface() gdriver.DriverInterface
 
-	SetStorageDriver( x StorageDriver )
-	GetStorageDriver( ) StorageDriver
+	SetStorageDriver(x StorageDriver)
+	GetStorageDriver() StorageDriver
 }
 
-
-// This is the minimum call set that every driver is required to implement
+// Conn has a minimum call set that every driver is required to implement
 type Conn interface {
 	UserUpdate(user *tenant.User) error
 	UserInsert(user *tenant.User) error
@@ -65,30 +59,32 @@ type Conn interface {
 	UserFetch(domain, key, value string) (*tenant.User, error)
 }
 
+// Opener is an interface that will open up the storage driver for stroing data
 type Opener interface {
 	Open(connect string, extraDriverOptions string) (Conn, error)
 }
-// Option Storge Creation interface
+
+// Creater is an optional Storge Creation interface
 type Creater interface {
 	CreateStore() error
 }
 
-//Optional Closing interface. If this isn't implemented, no error is reported.
+// Closer is an optional interface. If this isn't implemented, no error is reported.
 type Closer interface {
 	Close() error
 }
 
-//Optional Reset interface. This will reset any errors and cleanup any intermediate results
+//Reseter is an optional interface. This will reset any errors and cleanup any intermediate results
 type Reseter interface {
 	Reset()
 }
 
-// Optional database 'ping' interface. This will check the database connection
+// Pinger is an optional database 'ping' interface. This will check the database connection
 type Pinger interface {
 	Ping() error
 }
 
-//Optional Release interface. This will release any locks/resources that a driver may have set
+//Releaser optional interface. This will release any locks/resources that a driver may have set
 //For example, the MySQL will do a SELECT...FOR UPDATE for all of the FetchXXX calls. The
 //release will cause an explicit commit. This, in the code, will be called by a 'defer' call after
 //any fetch/insert operation. For other drivers, it can be ignored or perform any other operation
@@ -98,5 +94,3 @@ type Pinger interface {
 type Releaser interface {
 	Release() error
 }
-
-

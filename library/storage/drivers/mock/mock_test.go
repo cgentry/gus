@@ -30,28 +30,28 @@ func TestSimpleRegisterCycle(t *testing.T) {
 		So(serr, ShouldBeNil)
 
 		// FETCH BY EMAIL
-		user2, err := dbConn.UserFetch(storage.MATCH_ANY_DOMAIN, storage.FIELD_GUID, user.Guid)
+		user2, err := dbConn.UserFetch(storage.MatchAnyDomain, storage.FieldGUID, user.Guid)
 		So(err, ShouldBeNil)
 		So(user2.Domain, ShouldEqual, user.Domain)
 		So(user2.Token, ShouldEqual, user.Token)
 		So(user2.FullName, ShouldEqual, user.FullName)
 
 		// Fetch by TOKEN
-		user3, err := dbConn.UserFetch(storage.MATCH_ANY_DOMAIN, storage.FIELD_TOKEN, user.Token)
+		user3, err := dbConn.UserFetch(storage.MatchAnyDomain, storage.FieldToken, user.Token)
 		So(err, ShouldBeNil)
 		So(user3.Domain, ShouldEqual, user.Domain)
 		So(user3.Token, ShouldEqual, user.Token)
 		So(user3.FullName, ShouldEqual, user.FullName)
 
 		// FETCH BY EMAIL
-		user4, err := dbConn.UserFetch(user.Domain, storage.FIELD_EMAIL, user.Email)
+		user4, err := dbConn.UserFetch(user.Domain, storage.FieldEmail, user.Email)
 		So(err, ShouldBeNil)
 		So(user4.Domain, ShouldEqual, user.Domain)
 		So(user4.Token, ShouldEqual, user.Token)
 		So(user4.FullName, ShouldEqual, user.FullName)
 
 		// FETCH BY Login name
-		user5, err := dbConn.UserFetch(user.Domain, storage.FIELD_LOGIN, user.LoginName)
+		user5, err := dbConn.UserFetch(user.Domain, storage.FieldLogin, user.LoginName)
 		So(err, ShouldBeNil)
 		So(user5.Domain, ShouldEqual, user.Domain)
 		So(user5.Token, ShouldEqual, user.Token)

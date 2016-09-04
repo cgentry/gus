@@ -10,13 +10,12 @@
 package storage
 
 import (
-	. "github.com/cgentry/gus/ecode"
 	"github.com/cgentry/gdriver"
+	. "github.com/cgentry/gus/ecode"
 )
 
-const DRIVER_GROUP = "storage"
-
-
+// DriverGroup defines a logical grouping for the drivers
+const DriverGroup = "storage"
 
 type storeMap map[string]Storer
 
@@ -24,16 +23,17 @@ type storeMap map[string]Storer
 // consistent returns, such as getting the last error, discovering how
 // a connection was made (connectString) or the name of the driver (name)
 type Store struct {
-	name		  string
+	name          string
 	connectString string
 	isOpen        bool
 	lastError     error
-	rawDriver	  gdriver.DriverInterface
-	driver        StorageDriver			// From New(). This is not the db connection
-	connection    Conn					// from Open(). this is the true DB connection
+	rawDriver     gdriver.DriverInterface
+	driver        StorageDriver // From New(). This is not the db connection
+	connection    Conn          // from Open(). this is the true DB connection
 }
 
-func NewStore( name string ) Storer {
+// NewStore will return an address of the Store structure.
+func NewStore(name string) Storer {
 	return &Store{
 		name:          name,
 		isOpen:        false,
@@ -42,45 +42,51 @@ func NewStore( name string ) Storer {
 	}
 }
 
-// Select will pick a registered driver for use in the system.
-// Only one driver can be selected at a time. Calling GetDriver will
-// return the current driver
-// This will panic if no drivers have been registered
+// SetDefault sets the name of the driver that should be the default driver.
 func SetDefault(name string) Storer {
-	gdriver.Default(DRIVER_GROUP,name)
+	gdriver.Default(DriverGroup, name)
 	return GetDriver(name)
 }
 
-// GetDriver will fetch the gdriver, call New and build up the storage driver
-// interface. Store defines all possible calls and acts as a simple gateway in order to
-// make any driver respond to any calls, even if it isn't implemented.
+// GetDefaultDriver fetches the name of the default driver and then activates the driver
 func GetDefaultDriver() Storer {
-	name,_ := gdriver.GetDefaultName( DRIVER_GROUP )
-	return GetDriver( name )
+	name, _ := gdriver.GetDefaultName(DriverGroup)
+	return GetDriver(name)
 }
 
-func GetDriver( name string ) Storer {
-	st := NewStore( name )
-	st.SetStorageDriver( gdriver.MustNew( DRIVER_GROUP , name ).(StorageDriver ) )
-	drive, _ := gdriver.GetDriver( DRIVER_GROUP, name )
-	st.SetDriverInterface(drive )
+// GetDriver will pick the driver from the map and return a fully initialised storage driver to the caller.
+func GetDriver(name string) Storer {
+	st := NewStore(name)
+	st.SetStorageDriver(gdriver.MustNew(DriverGroup, name).(StorageDriver))
+	drive, _ := gdriver.GetDriver(DriverGroup, name)
+	st.SetDriverInterface(drive)
 	return st
 }
 
-func Open( defaultDriverName, dsn, options string ) ( Storer , error ) {
-	storeObject := SetDefault( defaultDriverName )
-	return storeObject, storeObject.Open( dsn, options )
+// Open will set the default name and then open the driver for storage activity
+func Open(defaultDriverName, dsn, options string) (Storer, error) {
+	storeObject := SetDefault(defaultDriverName)
+	return storeObject, storeObject.Open(dsn, options)
 }
 
-func ( s *Store ) SetDriverInterface( x gdriver.DriverInterface ){
+//SetDriverInterface is a low level function and should never be called. It will force the
+// storage driver to use the passed driver instead of the one defined.
+func (s *Store) SetDriverInterface(x gdriver.DriverInterface) {
 	s.rawDriver = x
 }
-func ( s *Store ) GetDriverInterface() gdriver.DriverInterface {
+
+// GetDriverInterface is a low level function that replaces the raw storage driver with the driver
+// passed.
+func (s *Store) GetDriverInterface() gdriver.DriverInterface {
 	return s.rawDriver
 }
-func ( s * Store ) SetStorageDriver( x StorageDriver ) {
+
+// SetStorageDriver will set the higher-level driver to the storagedriver passed.
+func (s *Store) SetStorageDriver(x StorageDriver) {
 	s.driver = x
 }
-func ( s *Store ) GetStorageDriver( ) StorageDriver {
+
+// GetStorageDriver will return the objects storage driver. This is for internal use only
+func (s *Store) GetStorageDriver() StorageDriver {
 	return s.driver
 }

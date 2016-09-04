@@ -15,13 +15,13 @@ const DRIVER_IDENTITY = "sqlite3"
 
 // These define all of the fields that are in the database, not in the User record.
 const (
-	FIELD_GUID           = storage.FIELD_GUID
-	FIELD_FULLNAME       = storage.FIELD_NAME
-	FIELD_EMAIL          = storage.FIELD_EMAIL
+	FieldGUID           = storage.FieldGUID
+	FIELD_FULLNAME       = storage.FieldName
+	FieldEmail          = storage.FieldEmail
 	FIELD_DOMAIN         = `Domain`
-	FIELD_LOGINNAME      = storage.FIELD_LOGIN
+	FIELD_LOGINNAME      = storage.FieldLogin
 	FIELD_PASSWORD       = `Password`
-	FIELD_TOKEN          = storage.FIELD_TOKEN
+	FieldToken          = storage.FieldToken
 	FIELD_SALT           = `Salt`
 	FIELD_ISACTIVE       = `IsActive`
 	FIELD_ISLOGGEDIN     = `IsLoggedIn`

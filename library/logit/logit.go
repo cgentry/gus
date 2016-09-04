@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	DRIVER_GROUP = "logging"
+	DriverGroup = "logging"
 )
 // The interface gives the set of methods that an encryption driver must implement.
 type LogitDriver interface {
@@ -24,16 +24,16 @@ type LogitDriver interface {
 
 
 func SetDefault( name string ) LogitDriver {
-	gdriver.Default( DRIVER_GROUP , name )
+	gdriver.Default( DriverGroup , name )
 	return GetDriver( name )
 }
 
 // This will panic if no drivers have been registered
 func GetDefaultDriver() LogitDriver {
-	return gdriver.MustNewDefault(DRIVER_GROUP).(LogitDriver)
+	return gdriver.MustNewDefault(DriverGroup).(LogitDriver)
 }
 
 // This will panic if no drivers have been registered
 func GetDriver(name string ) LogitDriver {
-	return gdriver.MustNew(DRIVER_GROUP, name ).(LogitDriver)
+	return gdriver.MustNew(DriverGroup, name ).(LogitDriver)
 }

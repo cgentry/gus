@@ -20,14 +20,15 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/cgentry/gus/cli"
-	"github.com/cgentry/gus/record/configure"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime/debug"
 	"strings"
+
+	"github.com/cgentry/gus/cli"
+	"github.com/cgentry/gus/record/configure"
 )
 
 var configFileName string
@@ -41,7 +42,7 @@ var commands = []*cli.Command{
 	helpEncrypt,
 }
 
-var help_template = `Usage:
+var helpTemplate = `Usage:
 
           go command [arguments]
 
@@ -52,10 +53,12 @@ Use "gus help [command]" for more information about a cli.
 
 `
 
+// Usage will output a help text and then exit.
 func Usage() {
-	cli.Usage(help_template, commands)
+	cli.Usage(helpTemplate, commands)
 	os.Exit(0)
 }
+
 func main() {
 	flag.Usage = Usage
 	flag.Parse()
@@ -66,7 +69,7 @@ func main() {
 		Usage()
 	}
 	if args[0] == "help" {
-		cli.Help(help_template, "gus", args, commands)
+		cli.Help(helpTemplate, "gus", args, commands)
 		return
 	}
 
@@ -86,9 +89,11 @@ func main() {
 	}
 }
 
+// GetConfigFileName is used to get the configuration filename and check the existance of the file. It will return
+// errors if either the directory or the file doesn't exist.
 func GetConfigFileName() (Filename string, DirExists error, FileExists error) {
 	if configFileName == "" {
-		configFileName = DEFAULT_CONFIG_FILENAME
+		configFileName = DefaultConfigFilename
 	}
 	_, DirExists = os.Stat(filepath.Dir(configFileName))
 	_, FileExists = os.Stat(configFileName)
@@ -96,6 +101,7 @@ func GetConfigFileName() (Filename string, DirExists error, FileExists error) {
 	return
 }
 
+// GetConfigFile will pull open up the configuration file and return a configuration object.
 func GetConfigFile() (*configure.Configure, error) {
 	var err error
 	c := configure.New()
@@ -115,17 +121,18 @@ func GetConfigFile() (*configure.Configure, error) {
 	return c, err
 }
 
+// SaveConfigFile will take the JSON string and write it to the output file
 func SaveConfigFile(jsonString []byte) error {
 	file, direrror, _ := GetConfigFileName()
 	if direrror != nil {
 		return direrror
 	}
-	return ioutil.WriteFile(file, jsonString, DEFAULT_CONFIG_PERMISSIONS)
+	return ioutil.WriteFile(file, jsonString, DefaultConfigPermissions)
 }
 
 // addCommonCommandFlags will add in flags that are system-wide.
 func addCommonCommandFlags(cmd *cli.Command) {
-	cmd.Flag.StringVar(&configFileName, "c", DEFAULT_CONFIG_FILENAME, "")
+	cmd.Flag.StringVar(&configFileName, "c", DefaultConfigFilename, "")
 }
 
 func runtimeFail(msg string, err error) {

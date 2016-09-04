@@ -35,7 +35,7 @@ func TestServiceRegister(t *testing.T) {
 	plaintext.SetDefault()
 	sr := NewServiceRegister()
 
-	store, err := storage.Open( sqlite.DRIVER_NAME, t_service_test_db, "")
+	store, err := storage.Open( sqlite.DriverName, t_service_test_db, "")
 	if err != nil {
 		t.Errorf("Error opening store: %s", err.Error())
 	}
@@ -244,7 +244,7 @@ func TestServiceRegister(t *testing.T) {
 			reqLogin.Login = "*Login"
 			reqLogin.Password = "12345678abcdefg"
 
-			originalUserRecord, err := ctrl.DataStore.UserFetch(caller.Domain, storage.FIELD_LOGIN, `*Login`)
+			originalUserRecord, err := ctrl.DataStore.UserFetch(caller.Domain, storage.FieldLogin, `*Login`)
 			So(err, ShouldBeNil)
 
 			h := head.New()
@@ -354,7 +354,7 @@ func TestServiceRegister(t *testing.T) {
 			So(userRtn5.FullName, ShouldEqual, userRtn4.FullName)
 			So(userRtn5.Email, ShouldEqual, userRtn4.Email)
 
-			lastUserRecord, err := ctrl.DataStore.UserFetch(caller.Domain, storage.FIELD_LOGIN, reqUpdate.Login)
+			lastUserRecord, err := ctrl.DataStore.UserFetch(caller.Domain, storage.FieldLogin, reqUpdate.Login)
 			So(err, ShouldBeNil)
 			So(lastUserRecord.Password, ShouldNotEqual, originalUserRecord.Password)
 		})*/

@@ -9,12 +9,13 @@ import (
 	//"time"
 )
 
+// PwdSha512 defines the values required for performing encryption
 type PwdSha512 struct {
 	Salt string
 	Cost int
 }
 
-// Create a new SHA512 encryption. The salt is given a static string but
+// New creates a SHA512 encryption object. The salt is given a static string but
 // can be set up on selection from the driver. This must be the same with every
 // load or you won't be able to verify credentials.
 func New() *PwdSha512 {
@@ -25,14 +26,19 @@ func New() *PwdSha512 {
 	return c
 }
 
+// Id returns the string identifier for this driver
 func (t *PwdSha512) Id() string {
-	return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_NAME)
+	return gdriver.Help(encryption.DriverGroup, DriverName, gdriver.IdentityName)
 }
+
+// ShortHelp returns a short string identifier for the identity.
 func (t *PwdSha512) ShortHelp() string {
-	return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_SHORT)
+	return gdriver.Help(encryption.DriverGroup, DriverName, gdriver.IdentityShort)
 }
+
+// LongHelp returns a longer descriptive text for the help
 func (t *PwdSha512) LongHelp() string {
-	return gdriver.Help(encryption.DRIVER_GROUP, DRIVER_NAME, gdriver.IDENT_LONG)
+	return gdriver.Help(encryption.DriverGroup, DriverName, gdriver.IdentityLong)
 }
 
 // EncryptPassword will encrypt the password using the user's salt and our salt.
@@ -56,7 +62,7 @@ func (t *PwdSha512) EncryptPassword(clearPassword, userSalt string) string {
 	return base64.StdEncoding.EncodeToString(previousPass)
 }
 
-// Setup should be called  when the driver has been selected for use. The options
+// Setup should be called when the driver has been selected for use. The options
 // are cross-encryption.. See the encryption for what these are.
 func (t *PwdSha512) Setup(jsonOption string) encryption.EncryptDriver {
 
@@ -81,11 +87,13 @@ func ( t *PwdSha512 ) setSalt( newEncryptionSalt string ){
 		t.Salt = newEncryptionSalt
 	}
 }
+
+// ComparePasswords must check to see if the passed password is equal to the stored password
 func (t *PwdSha512) ComparePasswords(hashedPassword, clearPassword, salt string) bool {
 	return hashedPassword == t.EncryptPassword(clearPassword, salt)
 }
 
-const const_sha512_help_template = `
+const constSha512HelpTemplate = `
   The SHA512 encryption driver is a reasonable hash method that attempts to balance cost
   and speed. It will take a password, the users salt, a system salt and hash them into
   a string.

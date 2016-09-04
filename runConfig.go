@@ -3,15 +3,18 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/cgentry/gus/cli"
-	"github.com/cgentry/gus/record/tenant"
-	"github.com/cgentry/gus/library/storage"
 	"os"
 	"strings"
+
+	"github.com/cgentry/gus/cli"
+	"github.com/cgentry/gus/library/storage"
+	"github.com/cgentry/gus/record/tenant"
 )
 
+// ConfigSetupAutosalt is the string that will be used to determine if you want an automatically
+// inserted salt into a configuration entry.
 const (
-	CONFIG_SETUP_AUTOSALT = "##salt##"
+	ConfigSetupAutosalt = "##salt##"
 )
 
 var cmdConfig = &cli.Command{
@@ -33,7 +36,7 @@ blanks.
 To enter a blank string, enter two quotes (""). If you enter nothing, the
 current value will be used.
 
-The default configuration file is stored in ` + DEFAULT_CONFIG_FILENAME + `
+The default configuration file is stored in ` + DefaultConfigFilename + `
 but can be overridden by entering the option "-c configfile". The directory
 must exist. If the file doesn't exist, defaults will be used when prompting.
 `,
@@ -83,30 +86,30 @@ func runConfig(cmd *cli.Command, args []string) {
 		c.Default()
 	}
 	for promptForValues = true; promptForValues; {
-		cli.PromptForStructFields(&c.Service, template_cmd_help_config)
+		cli.PromptForStructFields(&c.Service, templateCmdHelpConfig)
 		fmt.Println("\nValues are:")
 		cli.PrintStructValue(os.Stdout, &c.Service)
 		promptForValues = cli.PromptYesNoDefault(os.Stdout, os.Stdin, "Re-enter values", false)
 	}
 
 	for promptForValues = true; promptForValues; {
-		cli.PromptForStructFields(&c.Encrypt, template_cmd_help_config_crypt)
-		if strings.Contains(c.Encrypt.Options, CONFIG_SETUP_AUTOSALT) {
-			c.Encrypt.Options = strings.Replace(c.Encrypt.Options, CONFIG_SETUP_AUTOSALT, tenant.CreateSalt(200), -1)
+		cli.PromptForStructFields(&c.Encrypt, templateCmdHelpConfigCrypt)
+		if strings.Contains(c.Encrypt.Options, ConfigSetupAutosalt) {
+			c.Encrypt.Options = strings.Replace(c.Encrypt.Options, ConfigSetupAutosalt, tenant.CreateSalt(200), -1)
 		}
 		fmt.Println("\nValues are:")
 		cli.PrintStructValue(os.Stdout, &c.Encrypt)
 		promptForValues = cli.PromptYesNoDefault(os.Stdout, os.Stdin, "Re-enter values", false)
 	}
 	for promptForValues = true; promptForValues; {
-		cli.PromptForStructFields(&c.User, template_cmd_help_config_user)
+		cli.PromptForStructFields(&c.User, templateCmdHelpConfigUser)
 		fmt.Println("\nValues are:")
 		cli.PrintStructValue(os.Stdout, &c.User)
 		promptForValues = cli.PromptYesNoDefault(os.Stdout, os.Stdin, "Re-enter values", false)
 	}
 	if c.Service.ClientStore {
 		for promptForValues = true; promptForValues; {
-			cli.PromptForStructFields(&c.Client, template_cmd_help_config_client)
+			cli.PromptForStructFields(&c.Client, templateCmdHelpConfigClient)
 			fmt.Println("\nValues are:")
 			cli.PrintStructValue(os.Stdout, &c.Client)
 			promptForValues = cli.PromptYesNoDefault(os.Stdout, os.Stdin, "Re-enter values", false)
@@ -190,7 +193,7 @@ func runConfigList() {
 	fmt.Println("\n")
 }
 
-const template_cmd_help_config = `
+const templateCmdHelpConfig = `
 =================================
     Service Configuration
 =================================
@@ -199,7 +202,7 @@ This sets the general configuration for the running of the program{{ range . }}
         {{ .Help}}{{ end }}
 
 `
-const template_cmd_help_config_user = `
+const templateCmdHelpConfigUser = `
 =================================
     User Storage Connection
 =================================
@@ -212,7 +215,7 @@ Connection for User Information
 
 `
 
-const template_cmd_help_config_client = `
+const templateCmdHelpConfigClient = `
 =================================
     Client Storage Connection
 =================================
@@ -224,7 +227,7 @@ Connection for Client Information
         {{ .Help}}{{ end }}
 
 `
-const template_cmd_help_config_crypt = `
+const templateCmdHelpConfigCrypt = `
 =================================
     Password Encryption Driver
 =================================

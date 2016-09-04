@@ -50,13 +50,13 @@ func (t *SqliteConn) UserUpdate(user *tenant.User) error {
 			tenant.USER_STORE_NAME,
 
 			FIELD_DOMAIN,
-			FIELD_EMAIL,
+			FieldEmail,
 			FIELD_FAILCOUNT,
 			FIELD_FULLNAME,
 			FIELD_LOGINNAME,
 			FIELD_PASSWORD,
 			FIELD_SALT,
-			FIELD_TOKEN,
+			FieldToken,
 
 			FIELD_ISACTIVE,
 			FIELD_ISLOGGEDIN,
@@ -72,7 +72,7 @@ func (t *SqliteConn) UserUpdate(user *tenant.User) error {
 			FIELD_UPDATED_DT,
 			FIELD_DELETED_DT,
 
-			FIELD_GUID,
+			FieldGUID,
 		)
 
 	}
@@ -101,7 +101,7 @@ func (t *SqliteConn) UserUpdate(user *tenant.User) error {
 		user.GetUpdatedAtStr(),
 		user.GetDeletedAtStr(),
 
-		user.Guid) /* FIELD_GUID - KEY*/
+		user.Guid) /* FieldGUID - KEY*/
 	if err != nil {
 		return NewGeneralFromError(err, http.StatusInternalServerError)
 	}
@@ -125,14 +125,14 @@ func (t *SqliteConn) UserInsert(user *tenant.User) error {
 			tenant.USER_STORE_NAME,
 
 			FIELD_DOMAIN,
-			FIELD_EMAIL,
+			FieldEmail,
 			FIELD_FAILCOUNT,
 			FIELD_FULLNAME,
-			FIELD_GUID,
+			FieldGUID,
 			FIELD_LOGINNAME,
 			FIELD_PASSWORD,
 			FIELD_SALT,
-			FIELD_TOKEN,
+			FieldToken,
 
 			FIELD_ISACTIVE,
 			FIELD_ISLOGGEDIN,
@@ -220,16 +220,16 @@ func (t *SqliteConn) checkUserExists(user *tenant.User) error {
 			FROM %s
 			WHERE %s = ?
 			   OR ( %s = ? AND ( %s = ? OR %s = ?))`,
-		FIELD_GUID, /* SELECT ... */
+		FieldGUID, /* SELECT ... */
 		FIELD_DOMAIN,
-		FIELD_EMAIL,
+		FieldEmail,
 		FIELD_LOGINNAME,
 
 		tenant.USER_STORE_NAME, /* FROM ... */
 
-		FIELD_GUID, /* WHERE ... */
+		FieldGUID, /* WHERE ... */
 		FIELD_DOMAIN,
-		FIELD_EMAIL,
+		FieldEmail,
 		FIELD_LOGINNAME,
 	)
 

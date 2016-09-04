@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	PACKAGE_BODYTYPE_ERROR = "Error"
+	PackageBodytypeError = "Error"
 )
 
 type BodyInterface interface {

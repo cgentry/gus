@@ -1,9 +1,9 @@
 package storage
 
 import (
+	"github.com/cgentry/gdriver"
 	. "github.com/cgentry/gus/ecode"
 	"github.com/cgentry/gus/record/tenant"
-	"github.com/cgentry/gdriver"
 )
 
 // These are the names of fields we expect to occur in the database and will
@@ -11,37 +11,38 @@ import (
 // map them in the driver-level routines in order to provide names that are
 // more appropriate to the driver mechanism.
 const (
-	FIELD_EMAIL = `Email`
-	FIELD_NAME  = `FullName`
-	FIELD_GUID  = `Guid`
-	FIELD_LOGIN = `LoginName`
-	FIELD_TOKEN = `Token`
+	FieldEmail = `Email`
+	FieldName  = `FullName`
+	FieldGUID  = `Guid`
+	FieldLogin = `LoginName`
+	FieldToken = `Token`
 )
-const driver_name = "Storage"
 
-const MATCH_ANY_DOMAIN = "*"
-
+// MatchAnyDomain is a special character that should be used to search ALL domains.
+const MatchAnyDomain = "*"
 
 /* ======================================================
  * 					Store functions
  * ======================================================
  */
 
-
-func ( s *Store ) Id() string {
-	return s.rawDriver.Identity( gdriver.IDENT_NAME )
+// Id will return the identity of the storage driver
+func (s *Store) Id() string {
+	return s.rawDriver.Identity(gdriver.IdentityName)
 }
 
-func ( s *Store ) ShortHelp() string {
-	return s.rawDriver.Identity( gdriver.IDENT_SHORT )
+// ShortHelp will return a brief description of the storage driver.
+func (s *Store) ShortHelp() string {
+	return s.rawDriver.Identity(gdriver.IdentityShort)
 }
 
-func ( s *Store ) LongHelp() string {
-	return s.rawDriver.Identity( gdriver.IDENT_LONG )
+// LongHelp will return a long description of the storage driver. It should
+// give a fair amount of detail
+func (s *Store) LongHelp() string {
+	return s.rawDriver.Identity(gdriver.IdentityLong)
 }
 
-
-// Return the actual connection to the database for low-level access.
+// GetStorageConnector will return the actual connection to the database for low-level access.
 // This should be avoided unless you are coding for a very non-portable
 // function
 func (s *Store) GetStorageConnector() Conn {
@@ -52,11 +53,13 @@ func (s *Store) GetStorageConnector() Conn {
  * The following functions are provided by this class and are not
  * encapsulated
  */
-// Return the last known error condition that was given by a call
+
+// LastError returns the last known error condition that was given by a call
 func (s *Store) LastError() error {
 	return s.lastError
 }
 
+// SetLastError will save the last error that occured in this class
 func (s *Store) SetLastError(err error) *Store {
 	s.lastError = err
 	return s
@@ -67,15 +70,16 @@ func (s *Store) IsOpen() bool {
 	return s.isOpen
 }
 
-func ( s *Store ) saveLastError( err error ) error {
+// saveAndReturnError is used internally to save the erro but also to return it back to caller
+func (s *Store) saveAndReturnError(err error) error {
 	s.lastError = err
 	return err
 }
 
-func ( s *Store ) ClearErrors(){
+// ClearErrors simply clears the last stored error
+func (s *Store) ClearErrors() {
 	s.lastError = nil
 }
-
 
 /* ======================================================
  * 					Mandatory functions
@@ -88,42 +92,46 @@ func ( s *Store ) ClearErrors(){
 func (s *Store) Open(connect string, extraDriverOptions string) error {
 
 	if s.isOpen == true {
-		return s.saveLastError(ErrAlreadyOpen)
+		return s.saveAndReturnError(ErrAlreadyOpen)
 	}
 	s.isOpen = false
 	s.lastError = nil
 	s.connectString = connect
-	s.connection, s.lastError = s.driver.Open( connect, extraDriverOptions )
+	s.connection, s.lastError = s.driver.Open(connect, extraDriverOptions)
 
 	return s.lastError
 }
 
+// UserUpdate will update the 'tenant record in the database. It makes sure the
+// database is open to stop any problems with low-level drivers
 func (s *Store) UserUpdate(user *tenant.User) error {
 	if !s.isOpen {
 		s.lastError = ErrNotOpen
 		return ErrNotOpen
 	}
-	return s.saveLastError(s.connection.UserUpdate(user))
+	return s.saveAndReturnError(s.connection.UserUpdate(user))
 }
 
+// UserInsert will attempt to insert a new 'tenant' record in the datase. It makes sure
+// the database is open and will save any error code that occurs.
 func (s *Store) UserInsert(user *tenant.User) error {
 	if !s.isOpen {
 		s.lastError = ErrNotOpen
 		return ErrNotOpen
 	}
-	return s.saveLastError(s.connection.UserInsert(user))
+	return s.saveAndReturnError(s.connection.UserInsert(user))
 }
 
-// Fetch a user's record using the domain, a field name and the field value. There will only be one record
-// returned. If you pass MATCH_ANY_DOMAIN as the domain, this will only be valid for a small number of
+// UserFetch will find a tenant using the domain, a field name and the field value. There will only be one record
+// returned. If you pass MatchAnyDomain as the domain, this will only be valid for a small number of
 // key-types (e.g. enforced unique keys.)
 func (s *Store) UserFetch(domain, lookupKey, lookkupValue string) (*tenant.User, error) {
 	if !s.isOpen {
 		s.lastError = ErrNotOpen
 		return nil, ErrNotOpen
 	}
-	if domain == MATCH_ANY_DOMAIN {
-		if lookupKey != FIELD_GUID || lookupKey != FIELD_TOKEN {
+	if domain == MatchAnyDomain {
+		if lookupKey != FieldGUID || lookupKey != FieldToken {
 			return nil, ErrMatchAnyNotSupported
 		}
 	}
@@ -161,7 +169,7 @@ func (s *Store) Release() error {
 // ignore the call
 func (s *Store) Close() error {
 	if s.isOpen != true {
-		return s.saveLastError(ErrNotOpen)
+		return s.saveAndReturnError(ErrNotOpen)
 	}
 	s.isOpen = false
 	s.ClearErrors()
@@ -171,18 +179,20 @@ func (s *Store) Close() error {
 	return s.lastError
 }
 
-// If implemented, create the basic storage. If not implemented, an error will be returned.
+// CreateStore , if implemented, initialises any storage. If not implemented, an error will be returned.
 func (s *Store) CreateStore() error {
 	if s.isOpen != true {
-		return s.saveLastError(ErrNotOpen)
+		return s.saveAndReturnError(ErrNotOpen)
 	}
 
 	if creater, found := s.connection.(Creater); found {
-		return s.saveLastError(creater.CreateStore())
+		return s.saveAndReturnError(creater.CreateStore())
 	}
 	return ErrNoSupport
 }
 
+// Ping will test to see if the storage system is alive. This is an optional routine. If it
+// doesn't exist, a nil return occurs (no error)
 func (s *Store) Ping() error {
 	s.ClearErrors()
 	if pinger, found := s.connection.(Pinger); found {
@@ -191,49 +201,48 @@ func (s *Store) Ping() error {
 	return s.lastError
 }
 
-
 /* ------------------------ THE FOLLOWING ARE 'CONVENIENCE' FUNCTIONS ***********************/
 
-// Fetch a user by the GUID. No domains are required as this is the primary (or unique) key
-func (s *Store) FetchUserByGuid(guid string) (*tenant.User, error) {
+// FetchUserByGUID No domains are required as this is the primary (or unique) key
+func (s *Store) FetchUserByGUID(guid string) (*tenant.User, error) {
 	if !s.isOpen {
 		s.lastError = ErrNotOpen
 		return nil, ErrNotOpen
 	}
-	rec, err := s.connection.UserFetch(MATCH_ANY_DOMAIN, FIELD_GUID, guid)
+	rec, err := s.connection.UserFetch(MatchAnyDomain, FieldGUID, guid)
 	s.lastError = err
 	return rec, err
 }
 
-// Fetch a user by the logged-in token. If the user is not logged in, a 'User not found' error is returned.
+// FetchUserByToken If the user is not logged in, a 'User not found' error is returned.
 func (s *Store) FetchUserByToken(token string) (*tenant.User, error) {
 	if !s.isOpen {
 		s.lastError = ErrNotOpen
 		return nil, ErrNotOpen
 	}
-	rec, err := s.connection.UserFetch(MATCH_ANY_DOMAIN, FIELD_TOKEN, token)
+	rec, err := s.connection.UserFetch(MatchAnyDomain, FieldToken, token)
 	s.lastError = err
 	return rec, err
 }
 
-// Fetch a user by the email. Emails are not unique, except within a domain.
+// FetchUserByEmail Emails are not unique, except within a domain.
 func (s *Store) FetchUserByEmail(domain, email string) (*tenant.User, error) {
 	if !s.isOpen {
 		s.lastError = ErrNotOpen
 		return nil, ErrNotOpen
 	}
-	rec, err := s.connection.UserFetch(domain, FIELD_EMAIL, email)
+	rec, err := s.connection.UserFetch(domain, FieldEmail, email)
 	s.lastError = err
 	return rec, err
 }
 
-// Fetch the user record by the login string. Login names are only unique within the domain
+// FetchUserByLogin Login names are only unique within the domain
 func (s *Store) FetchUserByLogin(domain, loginName string) (*tenant.User, error) {
 	if !s.isOpen {
 		s.lastError = ErrNotOpen
 		return nil, ErrNotOpen
 	}
-	rec, err := s.connection.UserFetch(domain, FIELD_LOGIN, loginName)
+	rec, err := s.connection.UserFetch(domain, FieldLogin, loginName)
 	s.lastError = err
 	return rec, err
 }

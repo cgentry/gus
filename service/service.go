@@ -289,7 +289,7 @@ func logout(s *ServiceProcess) (record.Packer, error) {
 	logout, _ := s.RequestBody.(*request.Logout)
 
 	// Find the user - we have to use the TOKEN name for this
-	user, err := s.UserStore.UserFetch(s.Client.Domain, storage.FIELD_TOKEN, logout.Token)
+	user, err := s.UserStore.UserFetch(s.Client.Domain, storage.FieldToken, logout.Token)
 	if err != nil {
 		if err == ecode.ErrUserNotFound {
 			return s.PackageErr(ecode.ErrUserNotLoggedIn)
@@ -320,7 +320,7 @@ func authenticate(s *ServiceProcess) (record.Packer, error) {
 	auth, _ := s.RequestBody.(*request.Authenticate)
 
 	// Find the user - we have to use the TOKEN name for this
-	user, err := s.UserStore.UserFetch(s.Client.Domain, storage.FIELD_TOKEN, auth.Token)
+	user, err := s.UserStore.UserFetch(s.Client.Domain, storage.FieldToken, auth.Token)
 	if err != nil {
 		if err == ecode.ErrUserNotFound {
 			return s.PackageErr(ecode.ErrUserNotLoggedIn)
@@ -361,7 +361,7 @@ func update(s *ServiceProcess) (record.Packer, error) {
 	}
 
 	// Find the user via Token
-	user, err := s.UserStore.UserFetch(s.Client.Domain, storage.FIELD_TOKEN, update.Token)
+	user, err := s.UserStore.UserFetch(s.Client.Domain, storage.FieldToken, update.Token)
 	if err != nil {
 		return s.PackageErr(err)
 	}
@@ -442,7 +442,7 @@ func (s *ServiceProcess) PackageErr(err error) (record.Packer, error) {
 			fmt.Sprintf(`{ "Message": %s, "ReturnCode":%d }`, errcode.Error(), http.StatusInternalServerError))
 	}
 
-	s.ResponsePackage.SetBodyType(record.PACKAGE_BODYTYPE_ERROR)
+	s.ResponsePackage.SetBodyType(record.PackageBodytypeError)
 	s.ResponsePackage.SetBody(string(jsondata))
 	record.SignPackage(s.ResponsePackage)
 	return s.ResponsePackage, gerror
